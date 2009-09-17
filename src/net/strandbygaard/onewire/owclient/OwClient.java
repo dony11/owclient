@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -51,10 +52,6 @@ public class OwClient {
 
 	}
 
-	private void reset() {
-		this.deviceIdCache = new ArrayList<String>(5);
-	}
-
 	public OwDevice find(String id) throws IllegalArgumentException {
 		if (!OwDeviceFactory.canCreate(id)) {
 			throw new IllegalArgumentException("Device type is not supported");
@@ -63,6 +60,67 @@ public class OwClient {
 		String[] str = { "/" };
 		String path = getDevicePath(id, str);
 		return odf.createDevice(path);
+	}
+
+	/**
+	 * Returns a collection of all devices attached to this 1-wire network.
+	 * 
+	 * @return List<OwDevice> collection of attached devices.
+	 */
+	public List<OwDevice> list() {
+		// TODO Return a collection of all devices
+		return null;
+	}
+
+	/**
+	 * Returns a collection of all devices of a specific device family 
+	 * attached to this 1-wire network.
+	 *
+	 * @param familyCode representing the kind of devices to include
+	 * @return A collection of attached devices.
+	 */
+	public List<OwDevice> list(String familyCode) {
+		// TODO Return a collection of devices of the specified family code
+		return null;
+	}
+
+	public synchronized String[] dir(String path) {
+		String[] list = null;
+		try {
+			ownet.Connect();
+			list = ownet.DirAll(path);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				ownet.Disconnect();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return list;
+	}
+
+	public synchronized String read(String path) {
+		String msg = null;
+		try {
+			ownet.Connect();
+			msg = ownet.safeRead(path);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				ownet.Disconnect();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		return msg;
+	}
+
+	private void reset() {
+		this.deviceIdCache = new ArrayList<String>(5);
 	}
 
 	protected String getDevicePath(String id, String[] in) {
@@ -151,42 +209,6 @@ public class OwClient {
 		}
 	}
 
-	public synchronized String[] dir(String path) {
-		String[] list = null;
-		try {
-			ownet.Connect();
-			list = ownet.DirAll(path);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			try {
-				ownet.Disconnect();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
-		return list;
-	}
-
-	public synchronized String read(String path) {
-		String msg = null;
-		try {
-			ownet.Connect();
-			msg = ownet.safeRead(path);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			try {
-				ownet.Disconnect();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
-		return msg;
-	}
-
 	public static void main(String[] args) {
 		OwClient owc = null;
 		final OptionParser parser = new OptionParser();
@@ -231,7 +253,6 @@ public class OwClient {
 				owc = new OwClient();
 			}
 		}
-
 
 		if (options.has("id")) {
 			OwDevice device = owc.find(options.valueOf(id));
