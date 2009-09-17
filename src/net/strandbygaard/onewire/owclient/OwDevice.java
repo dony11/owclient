@@ -1,5 +1,5 @@
 /**
- * Module: owbus/java
+ * Module: owclient/java
  * 
  * Copyright (C) 2009 Martin Strandbygaard
  * 
@@ -19,14 +19,16 @@
 
 package net.strandbygaard.onewire.owclient;
 
-import net.strandbygaard.onewire.device.OwId;
-
 public interface OwDevice {
 
 	String getId();
 
 	String getPath();
 	
-	String[] getValuePaths();
+	long getLastUpdate();
+	
+	double read();
+	
+	boolean canUpdate();
 
 }

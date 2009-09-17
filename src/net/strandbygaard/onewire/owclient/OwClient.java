@@ -1,5 +1,5 @@
 /**
- * Module: owbus/java
+ * Module: owclient/java
  * 
  * Copyright (C) 2009 Martin Strandbygaard
  * 
@@ -22,6 +22,7 @@ package net.strandbygaard.onewire.owclient;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -32,12 +33,11 @@ import org.owfs.ownet.OWNet;
 public class OwClient {
 
 	OWNet ownet = null;
+	private OwDeviceFactory odf = null;
+	private ArrayList<String> deviceIdCache = null;
 
 	public OwClient() {
-		if (ownet == null) {
-			OwConnectionFactory.init();
-			ownet = OwConnectionFactory.getConnection();
-		}
+		this("127.0.0.1", 4304);
 	}
 
 	public OwClient(String host, int port) {
@@ -45,8 +45,111 @@ public class OwClient {
 			OwConnectionFactory.init(host, port);
 			ownet = OwConnectionFactory.getConnection();
 		}
+		OwDeviceFactory.init(this);
+		this.odf = new OwDeviceFactory();
+		reset();
+
 	}
 
+	private void reset() {
+		this.deviceIdCache = new ArrayList<String>(5);
+	}
+
+	public OwDevice find(String id) throws IllegalArgumentException {
+		if (!OwDeviceFactory.canCreate(id)) {
+			throw new IllegalArgumentException("Device type is not supported");
+		}
+		reset();
+		String[] str = { "/" };
+		String path = getDevicePath(id, str);
+		return odf.createDevice(path);
+	}
+
+	protected String getDevicePath(String id, String[] in) {
+		ArrayList<String> paths = new ArrayList<String>(5);
+		String path = null;
+		for (String i : in) {
+			String[] str = this.dir(i);
+			for (String s : str) {
+				paths.add(s);
+			}
+		}
+
+		ArrayList<String> next = new ArrayList<String>(10);
+
+		for (String p : paths) {
+			String curId = p.substring(p.lastIndexOf("/") + 1);
+			if (curId.equalsIgnoreCase(id)) {
+				return p;
+			}
+			if (curId.startsWith("1F")) {
+				if (!deviceIdCache.contains(curId)) {
+					deviceIdCache.add(curId);
+					next.add(p + "/main/");
+				}
+			}
+		}
+		if (!next.isEmpty()) {
+			String str[] = new String[next.size()];
+			next.toArray(str);
+			path = getDevicePath(id, str);
+			if (path != null) {
+				return path;
+			}
+		}
+
+		return path;
+	}
+
+	public void print() {
+		if (deviceIdCache != null) {
+			if (!deviceIdCache.isEmpty()) {
+				reset();
+			}
+		} else {
+			reset();
+		}
+
+		String[] str = { "/" };
+		print(str);
+	}
+
+	protected synchronized void print(String[] in) {
+		ArrayList<String> paths = new ArrayList<String>(5);
+
+		for (String i : in) {
+			String[] str = this.dir(i);
+			for (String s : str) {
+				paths.add(s);
+			}
+		}
+
+		ArrayList<String> next = new ArrayList<String>(10);
+
+		for (String p : paths) {
+			String id = p.substring(p.lastIndexOf("/") + 1);
+			if (id.startsWith("10.") || id.startsWith("26.")
+					|| id.startsWith("81.")) {
+				if (!deviceIdCache.contains(id)) {
+					System.out.println(p);
+					deviceIdCache.add(id);
+				}
+			}
+			if (id.startsWith("1F")) {
+				if (!deviceIdCache.contains(id)) {
+					deviceIdCache.add(id);
+					System.out.println(p);
+					next.add(p + "/main/");
+				}
+
+			}
+		}
+		if (!next.isEmpty()) {
+			String str[] = new String[next.size()];
+			next.toArray(str);
+			print(str);
+		}
+	}
 
 	public synchronized String[] dir(String path) {
 		String[] list = null;
@@ -62,7 +165,7 @@ public class OwClient {
 				ex.printStackTrace();
 			}
 		}
-	
+
 		return list;
 	}
 
@@ -80,10 +183,9 @@ public class OwClient {
 				ex.printStackTrace();
 			}
 		}
-	
+
 		return msg;
 	}
-
 
 	public static void main(String[] args) {
 		OwClient owc = null;
@@ -96,6 +198,10 @@ public class OwClient {
 		OptionSpec<String> id = parser.acceptsAll(asList("i", "id"),
 				"ID of 1-wire device to read.").withRequiredArg().ofType(
 				String.class);
+		parser.acceptsAll(asList("temp", "temperature"),
+				"Output temperature reading of specified device");
+		parser.acceptsAll(asList("hum", "humidity"),
+				"Output humidity reading of specified device");
 		parser.acceptsAll(asList("a", "all"),
 				"Print values of all devices attached to 1-wire bus.");
 		parser.acceptsAll(asList("?", "help"), "Shows help");
@@ -126,47 +232,24 @@ public class OwClient {
 			}
 		}
 
-		OwTree owt = new OwTree(owc);
-		// if (options.has("id")) {
-		// OwDevice device = OwDeviceFactory.createDevice("id");
-		// String[] paths = device.getValuePaths();
-		// for (String p : paths) {
-		// System.out.println(owc.read(p));
-		// }
-		// } else {
-		//
-		// }
 
-		owt.print();
-
-	}
-
-	private static OptionSet getOptions(String[] args) {
-		final OptionParser parser = new OptionParser();
-		OptionSpec<String> host = parser.acceptsAll(asList("h", "host"),
-				"Address of owserver.").withRequiredArg().ofType(String.class);
-		OptionSpec<Integer> port = parser.acceptsAll(asList("p", "port"),
-				"Port of owserver. Defaults to port 4304").withRequiredArg()
-				.ofType(Integer.class);
-		OptionSpec<String> id = parser.acceptsAll(asList("i", "id"),
-				"ID of 1-wire device to read.").withRequiredArg().ofType(
-				String.class);
-		parser.acceptsAll(asList("a", "all"),
-				"Print values of all devices attached to 1-wire bus.");
-		parser.acceptsAll(asList("?", "help"), "Shows help");
-
-		OptionSet options = parser.parse(args);
-
-		if (options.has("?")) {
-			try {
-				parser.printHelpOn(System.out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				System.exit(0);
+		if (options.has("id")) {
+			OwDevice device = owc.find(options.valueOf(id));
+			if (options.has("temperature")) {
+				if (device.getClass() == DS18S20.class) {
+					System.out.print(((DS18S20) device).getTemperature());
+				}
+				if (device.getClass() == DS2438.class) {
+					System.out.print(((DS2438) device).getTemperature());
+				}
 			}
-		}
 
-		return options;
+			if (options.has("humidity")) {
+				if (device.getClass() == DS2438.class) {
+					System.out.print(((DS2438) device).getHumidity());
+				}
+			}
+
+		}
 	}
 }

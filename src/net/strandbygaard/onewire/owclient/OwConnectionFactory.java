@@ -44,6 +44,7 @@ public class OwConnectionFactory {
 			}
 			isInitialized = true;
 		}
+		ownet.setFormatflags(OWNet.OWNET_FLAG_T_C);
 		return ownet;
 	}
 
@@ -51,13 +52,9 @@ public class OwConnectionFactory {
 		if (!isInitialized) {
 			host = h;
 			port = p;
-			init();
-		}
-	}
-
-	public synchronized static void init() {
-		if (!isInitialized) {
-			isInitialized = true;
+			if (!isInitialized) {
+				isInitialized = true;
+			}
 		}
 	}
 
