@@ -33,23 +33,26 @@ import org.owfs.ownet.OWNet;
 
 public class OwClient {
 
+	/**
+	 * An enumeration of the 1-wire devices supported by OwClient.
+	 */
+	public static enum DeviceType {
+		DS18S20, DS2438, DS2409
+	};
+
 	OWNet ownet = null;
 	private OwDeviceFactory odf = null;
 	private ArrayList<String> deviceIdCache = null;
 
-	public OwClient() {
-		this("127.0.0.1", 4304);
-	}
-
-	public OwClient(String host, int port) {
+	public OwClient(OWNet ownet) throws IllegalArgumentException {
 		if (ownet == null) {
-			OwConnectionFactory.init(host, port);
-			ownet = OwConnectionFactory.getConnection();
+			throw new IllegalArgumentException(
+					"Failed to contstruct OwClient with OWNet == null. Cannot contstruct OwClient object without OWNet object.");
 		}
+		this.ownet = ownet;
 		OwDeviceFactory.init(this);
 		this.odf = new OwDeviceFactory();
 		reset();
-
 	}
 
 	public OwDevice find(String id) throws IllegalArgumentException {
@@ -73,10 +76,11 @@ public class OwClient {
 	}
 
 	/**
-	 * Returns a collection of all devices of a specific device family 
-	 * attached to this 1-wire network.
-	 *
-	 * @param familyCode representing the kind of devices to include
+	 * Returns a collection of all devices of a specific device family attached
+	 * to this 1-wire network.
+	 * 
+	 * @param familyCode
+	 *            representing the kind of devices to include
 	 * @return A collection of attached devices.
 	 */
 	public List<OwDevice> list(String familyCode) {
@@ -105,14 +109,14 @@ public class OwClient {
 		String msg = null;
 		try {
 			ownet.Connect();
-			msg = ownet.safeRead(path);
+			msg = ownet.Read(path);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
 			try {
 				ownet.Disconnect();
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -242,15 +246,20 @@ public class OwClient {
 
 		if (options.has(host)) {
 			if (options.has(port)) {
-				owc = new OwClient(options.valueOf(host), options.valueOf(port));
+				OWNet ownet = new OWNet(options.valueOf(host), options
+						.valueOf(port));
+				owc = new OwClient(ownet);
 			} else {
-				owc = new OwClient((String) options.valueOf(host), 4304);
+				OWNet ownet = new OWNet(options.valueOf(host), 4304);
+				owc = new OwClient(ownet);
 			}
 		} else {
 			if (options.has("port")) {
-				owc = new OwClient("127.0.0.1", options.valueOf(port));
+				OWNet ownet = new OWNet("127.0.0.1", options.valueOf(port));
+				owc = new OwClient(ownet);
 			} else {
-				owc = new OwClient();
+				OWNet ownet = new OWNet("127.0.0.1", 4304);
+				owc = new OwClient(ownet);
 			}
 		}
 
