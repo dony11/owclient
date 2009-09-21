@@ -19,15 +19,9 @@
 
 package net.strandbygaard.onewire.owclient;
 
-import static java.util.Arrays.asList;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
 
 import org.owfs.ownet.OWNet;
 
@@ -40,9 +34,10 @@ public class OwClient {
 		DS18S20, DS2438, DS2409
 	};
 
+	private final static String[] familyCodes = { "10", "26", "81", "1F" };
+
 	OWNet ownet = null;
-	private OwDeviceFactory odf = null;
-	private ArrayList<String> deviceIdCache = null;
+	OwDeviceFactory odf = null;
 
 	public OwClient(OWNet ownet) throws IllegalArgumentException {
 		if (ownet == null) {
@@ -52,16 +47,15 @@ public class OwClient {
 		this.ownet = ownet;
 		OwDeviceFactory.init(this);
 		this.odf = new OwDeviceFactory();
-		reset();
 	}
 
-	public OwDevice find(String id) throws IllegalArgumentException {
+	public OwDevice find(String id) throws UnsupportedDeviceException,
+			DeviceNotFoundException {
 		if (!OwDeviceFactory.canCreate(id)) {
 			throw new IllegalArgumentException("Device type is not supported");
 		}
-		reset();
 		String[] str = { "/" };
-		String path = getDevicePath(id, str);
+		String path = getDevicePath(id, str, null);
 		return odf.createDevice(path);
 	}
 
@@ -71,8 +65,10 @@ public class OwClient {
 	 * @return List<OwDevice> collection of attached devices.
 	 */
 	public List<OwDevice> list() {
-		// TODO Return a collection of all devices
-		return null;
+		String[] in = { "/" };
+		List<OwDevice> list = list("*", in, null, null);
+		System.err.println(list.size());
+		return list;
 	}
 
 	/**
@@ -82,10 +78,85 @@ public class OwClient {
 	 * @param familyCode
 	 *            representing the kind of devices to include
 	 * @return A collection of attached devices.
+	 * @throws UnsupportedDeviceException
 	 */
-	public List<OwDevice> list(String familyCode) {
-		// TODO Return a collection of devices of the specified family code
-		return null;
+	public List<OwDevice> list(String familyCode)
+			throws UnsupportedDeviceException {
+		String[] in = { "/" };
+		if (!isSupported(familyCode)) {
+			throw new UnsupportedDeviceException("The device type: "
+					+ familyCode + " is not supported.");
+		}
+
+		List<OwDevice> list = list(familyCode, in, null, null);
+		return list;
+	}
+
+	public List<OwDevice> list(String familyCode, String path) {
+		String[] in = { path }; // TODO Check valid path
+		List<OwDevice> list = list("*", in, null, null);
+		System.err.println(list.size());
+		return list;
+	}
+
+	/**
+	 * @param familyCode
+	 * @param in
+	 * @param devices
+	 * @param deviceIdCache
+	 * @return
+	 */
+	protected List<OwDevice> list(String familyCode, String[] in,
+			List<OwDevice> devices, List<String> deviceIdCache) {
+		if (devices == null) {
+			devices = new ArrayList<OwDevice>(5);
+		}
+		if (deviceIdCache == null) {
+			deviceIdCache = new ArrayList<String>(5);
+		}
+
+		ArrayList<String> paths = new ArrayList<String>(5);
+
+		for (String i : in) {
+			String[] str = this.dir(i);
+			if (str != null) {
+				for (String s : str) {
+					paths.add(s);
+				}
+			}
+		}
+
+		ArrayList<String> next = new ArrayList<String>(10);
+
+		for (String p : paths) {
+			String curId = p.substring(p.lastIndexOf("/") + 1);
+			String curFamilyCode = curId.substring(0, 2);
+			if (curId.startsWith("1F")) {
+				if (!deviceIdCache.contains(curId)) {
+					deviceIdCache.add(curId);
+					next.add(p + "/main/");
+				}
+			}
+			if (isSupportedSensor(curFamilyCode)) {
+				if (familyCode.equalsIgnoreCase("*")
+						|| curFamilyCode.equalsIgnoreCase(familyCode)) {
+					OwDevice owd;
+					try {
+						owd = odf.createDevice(p);
+						devices.add(owd);
+					} catch (UnsupportedDeviceException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		if (!next.isEmpty()) {
+			String str[] = new String[next.size()];
+			next.toArray(str);
+			return list(familyCode, str, devices, deviceIdCache);
+		}
+
+		return devices;
 	}
 
 	public synchronized String[] dir(String path) {
@@ -109,7 +180,7 @@ public class OwClient {
 		String msg = null;
 		try {
 			ownet.Connect();
-			msg = ownet.Read(path);
+			msg = ownet.Read(path); // TODO Verify correct path
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -119,21 +190,23 @@ public class OwClient {
 				e.printStackTrace();
 			}
 		}
-
 		return msg;
 	}
 
-	private void reset() {
-		this.deviceIdCache = new ArrayList<String>(5);
-	}
+	protected String getDevicePath(String id, String[] in,
+			List<String> deviceIdCache) {
 
-	protected String getDevicePath(String id, String[] in) {
+		if (deviceIdCache == null) {
+			deviceIdCache = new ArrayList<String>(5);
+		}
 		ArrayList<String> paths = new ArrayList<String>(5);
 		String path = null;
 		for (String i : in) {
 			String[] str = this.dir(i);
-			for (String s : str) {
-				paths.add(s);
+			if (str != null) {
+				for (String s : str) {
+					paths.add(s);
+				}
 			}
 		}
 
@@ -154,7 +227,7 @@ public class OwClient {
 		if (!next.isEmpty()) {
 			String str[] = new String[next.size()];
 			next.toArray(str);
-			path = getDevicePath(id, str);
+			path = getDevicePath(id, str, deviceIdCache);
 			if (path != null) {
 				return path;
 			}
@@ -163,26 +236,69 @@ public class OwClient {
 		return path;
 	}
 
-	public void print() {
-		if (deviceIdCache != null) {
-			if (!deviceIdCache.isEmpty()) {
-				reset();
-			}
-		} else {
-			reset();
-		}
+	/**
+	 * Checks if a <i>sensor</i> identified by a 1-wire ID or family code is
+	 * supported by this implementation.
+	 * 
+	 * @param idOrFamilyCode
+	 *            to check if it is supported
+	 * @return <code>true</code> if the ID or family code is supported and
+	 *         <code>false</code> if not.
+	 */
+	public static boolean isSupportedSensor(String idOrFamilyCode) {
 
-		String[] str = { "/" };
-		print(str);
+		idOrFamilyCode = idOrFamilyCode.trim();
+		if (idOrFamilyCode.length() > 2) {
+			idOrFamilyCode = idOrFamilyCode.substring(0, 2);
+		}
+		if (idOrFamilyCode.equalsIgnoreCase("1F")) {
+			return false;
+		} else {
+			return isSupported(idOrFamilyCode);
+		}
 	}
 
-	protected synchronized void print(String[] in) {
+	/**
+	 * Checks if <i>any device</i> identified by a 1-wire ID or family code is
+	 * supported by this implementation.
+	 * 
+	 * @param idOrFamilyCode
+	 *            to check if it is supported
+	 * @return <code>true</code> if the ID or family code is supported and
+	 *         <code>false</code> if not.
+	 */
+	public static boolean isSupported(String idOrFamilyCode) {
+		boolean supported = false;
+
+		idOrFamilyCode = idOrFamilyCode.trim();
+		if (idOrFamilyCode.length() > 2) {
+			idOrFamilyCode = idOrFamilyCode.substring(0, 2);
+		}
+
+		for (String code : familyCodes) {
+			if (code.equalsIgnoreCase(idOrFamilyCode)) {
+				supported = true;
+			}
+		}
+
+		return supported;
+	}
+
+	public void print() {
+
+		String[] str = { "/" };
+		print(str, null);
+	}
+
+	protected synchronized void print(String[] in, List<String> deviceIdCache) {
 		ArrayList<String> paths = new ArrayList<String>(5);
 
 		for (String i : in) {
 			String[] str = this.dir(i);
-			for (String s : str) {
-				paths.add(s);
+			if (str != null) {
+				for (String s : str) {
+					paths.add(s);
+				}
 			}
 		}
 
@@ -193,14 +309,12 @@ public class OwClient {
 			if (id.startsWith("10.") || id.startsWith("26.")
 					|| id.startsWith("81.")) {
 				if (!deviceIdCache.contains(id)) {
-					System.out.println(p);
 					deviceIdCache.add(id);
 				}
 			}
 			if (id.startsWith("1F")) {
 				if (!deviceIdCache.contains(id)) {
 					deviceIdCache.add(id);
-					System.out.println(p);
 					next.add(p + "/main/");
 				}
 
@@ -209,77 +323,7 @@ public class OwClient {
 		if (!next.isEmpty()) {
 			String str[] = new String[next.size()];
 			next.toArray(str);
-			print(str);
-		}
-	}
-
-	public static void main(String[] args) {
-		OwClient owc = null;
-		final OptionParser parser = new OptionParser();
-		OptionSpec<String> host = parser.acceptsAll(asList("h", "host"),
-				"Address of owserver.").withRequiredArg().ofType(String.class);
-		OptionSpec<Integer> port = parser.acceptsAll(asList("p", "port"),
-				"Port of owserver. Defaults to port 4304").withRequiredArg()
-				.ofType(Integer.class);
-		OptionSpec<String> id = parser.acceptsAll(asList("i", "id"),
-				"ID of 1-wire device to read.").withRequiredArg().ofType(
-				String.class);
-		parser.acceptsAll(asList("temp", "temperature"),
-				"Output temperature reading of specified device");
-		parser.acceptsAll(asList("hum", "humidity"),
-				"Output humidity reading of specified device");
-		parser.acceptsAll(asList("a", "all"),
-				"Print values of all devices attached to 1-wire bus.");
-		parser.acceptsAll(asList("?", "help"), "Shows help");
-
-		OptionSet options = parser.parse(args);
-
-		if (options.has("?")) {
-			try {
-				parser.printHelpOn(System.out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				System.exit(0);
-			}
-		}
-
-		if (options.has(host)) {
-			if (options.has(port)) {
-				OWNet ownet = new OWNet(options.valueOf(host), options
-						.valueOf(port));
-				owc = new OwClient(ownet);
-			} else {
-				OWNet ownet = new OWNet(options.valueOf(host), 4304);
-				owc = new OwClient(ownet);
-			}
-		} else {
-			if (options.has("port")) {
-				OWNet ownet = new OWNet("127.0.0.1", options.valueOf(port));
-				owc = new OwClient(ownet);
-			} else {
-				OWNet ownet = new OWNet("127.0.0.1", 4304);
-				owc = new OwClient(ownet);
-			}
-		}
-
-		if (options.has("id")) {
-			OwDevice device = owc.find(options.valueOf(id));
-			if (options.has("temperature")) {
-				if (device.getClass() == DS18S20.class) {
-					System.out.print(((DS18S20) device).getTemperature());
-				}
-				if (device.getClass() == DS2438.class) {
-					System.out.print(((DS2438) device).getTemperature());
-				}
-			}
-
-			if (options.has("humidity")) {
-				if (device.getClass() == DS2438.class) {
-					System.out.print(((DS2438) device).getHumidity());
-				}
-			}
-
+			print(str, deviceIdCache);
 		}
 	}
 }

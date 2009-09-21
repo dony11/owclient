@@ -35,26 +35,47 @@ public class OwDeviceFactory {
 		}
 	}
 
-	public OwDevice createDevice(String path) {
+	public OwDevice createDevice(String path) throws UnsupportedDeviceException {
 		OwDevice dev = null;
 		dev = construct(path);
 		return dev;
 	}
 
-	private OwDevice construct(String path) {
-		OwDevice dev = null;
-		String id = path.substring(path.lastIndexOf("/") + 1);
-
-		if (!canCreate(id)) {
-			return dev;
+	private OwDevice construct(String path) throws UnsupportedDeviceException {
+		if (path == null) {
+			return null;
 		}
 
-		if (id.startsWith("26.")) {
+		OwDevice dev = null;
+		String id = path.substring(path.lastIndexOf("/") + 1);
+		id = id.substring(0, 2);
+		id = id.toUpperCase();
+
+		if (!canCreate(id)) {
+			throw new UnsupportedDeviceException(
+					"Unable to create device with family code: "
+							+ id.substring(0, 2));
+		}
+
+		if (id.equalsIgnoreCase("10")) {
+			dev = new DS18S20(path, owc);
+		}
+
+		if (id.equalsIgnoreCase("26")) {
 			dev = new DS2438(path, owc);
 		}
 
-		if (id.startsWith("10.")) {
-			dev = new DS18S20(path, owc);
+		if (id.equalsIgnoreCase("81")) {
+			dev = new OwDeviceImpl(path, owc) {
+				@Override
+				public double read() {
+					return 0;
+				}
+			};
+		}
+
+		if (id.equalsIgnoreCase("1F")) {
+			dev = new DS2409(path, owc);
 		}
 
 		return dev;
@@ -62,8 +83,8 @@ public class OwDeviceFactory {
 
 	public static boolean canCreate(String id) {
 		boolean b = false;
-		if (id.startsWith("10.") || id.startsWith("26.")
-				|| id.startsWith("81.") || id.startsWith("1F.")) {
+		if (id.startsWith("10") || id.startsWith("26") || id.startsWith("81")
+				|| id.startsWith("1F")) {
 			b = true;
 		}
 		return b;

@@ -25,10 +25,6 @@ public class OwHttpdParser {
 			for (String path : top) {
 				if(path.startsWith("/1F."))
 				{
-					String [] bus = ownet.Dir(path);
-					for (String item : bus) {
-						
-					}
 				}
 				if(path.startsWith("/26."))
 				{
