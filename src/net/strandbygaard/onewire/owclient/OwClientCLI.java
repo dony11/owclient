@@ -48,7 +48,6 @@ public class OwClientCLI {
 		owc.process();
 		owc.stopTimer();
 		owc.printRuntime();
-
 	}
 
 	public void printRuntime() {

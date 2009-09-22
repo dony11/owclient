@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ 	Module: owclient/java
+
+	Copyright (C) 2009 Martin Strandbygaard
+
+	This program is free software: you can redistribute it and/or modify it under
+	the terms of the GNU General Public License as published by the Free Software
+	Foundation, either version 3 of the License, or (at your option) any later
+	version.
+
+	This program is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+	details.
+
+	You should have received a copy of the GNU General Public License along with
+	this program. If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!-- ====================================================================== 
+     22/09/2009                                                        
+
+     This project implements an object oriented Java API that implements 
+     the client side of the owserver protocol. It can be used to build 
+     Java programs that use data from sensors attached to an 1-wire 
+     (onewire) network.
+
+	 It is built upon OWNet.java (http://www.owfs.org) and exposes a high 
+	 level API for reading data from sensors on a 1-wire network.
+
+     The library exposes sensors attached to a 1-wire network as collections 
+     of objects, and the library handles all 1-wire specific implementation 
+     details.
+                   
+     Martin Strandbygaard                                                                
+     ====================================================================== -->
+<project name="owclient" default="compile" basedir=".">
+	<description>
+		Ant build file to create owclient artifiacts.
+	</description>
+
+	<property name="project.name" value="owclient" />
+	<property name="project.keystore" value="${res.dir}/project.keystore" />
+	<property name="project.alias" value="owclient" />
+	<property name="project.password" value="Test1234" />
+	<property name="project.O" value="net.strandbygaard.onewire.owclient" />
+	<property name="project.C" value="DK" />
+
+	<property name="jar.name" value="owclient.jar" />
+
+	<property name="meta-inf.dir" value="META-INF" />
+	<property name="src.dir" value="src" />
+
+	<property name="build.dir" value="build" />
+	<property name="jar.dir" value="${build.dir}/jar" />
+
+	<property name="lib.dir" value="lib" />
+	<property name="res.dir" value="res" />
+	<property name="class.dir" value="${build.dir}/class" />
+	<property name="bin.dir" value="${build.dir}/bin" />
+
+	<!-- The build classpath -->
+	<path id="build.classpath">
+		<fileset refid="lib.jars" />
+		<fileset id="lib.jars" dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="clean">
+		<delete dir="${jar.dir}" />
+		<delete dir="${class.dir}" />
+		<delete dir="${bin.dir}" />
+		<delete dir="${lib.org.dir}" />
+		<delete dir="${lib.com.dir}" />
+
+		<unzip dest="${lib.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</unzip>
+		<delete dir="${lib.dir}/META-INF" />
+	</target>
+
+	<!-- ================================================================ 
+          target: prepare
+         ================================================================ -->
+	<target name="prepare">
+		<description>
+			Initializes a build
+		</description>
+		<tstamp />
+	</target>
+
+	<!-- ================================================================ 
+          target: compile
+         ================================================================ -->
+	<target name="compile" depends="prepare">
+		<description>
+		Compiles the sources
+		</description>
+		<mkdir dir="${class.dir}" />
+		<javac destdir="${class.dir}" classpathref="build.classpath">
+			<src path="${src.dir}" />
+		</javac>
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          target: jar.depends  
+	  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+	<target name="jar.depends">
+		<description>
+			Common preparations to create distribution jar file
+		</description>
+		<mkdir dir="${jar.dir}" />
+		<delete>
+			<fileset dir="${jar.dir}">
+				<include name="*" />
+			</fileset>
+		</delete>
+	</target>
+
+
+	<!-- ================================================================ 
+          target: jar
+         ================================================================ -->
+	<target name="jar" depends="compile,jar.depends">
+		<description>
+			Create full distribution jar including all "heavy" dependencies
+		</description>
+
+		<jar basedir="${class.dir}" jarfile="${jar.dir}/${project.name}.jar">
+			<fileset dir="${lib.dir}" includes="**/*.class" />
+			<!-- fileset dir="${src.dir}" includes="**/xml/*" />
+			<fileset dir="." includes="**/img/*"/ -->
+			<manifest>
+				<attribute name="Built-By" value="Martin Strandbygaard" />
+				<attribute name="Build-Date" value="${DSTAMP}" />
+				<attribute name="Build-Time" value="${TSTAMP}" />
+				<attribute name="Main-Class" value="net/strandbygaard/onewire/owclient/OwClientCLI" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- ================================================================ 
+          target: jar.slim
+         ================================================================ -->
+	<target name="jar.slim" depends="compile,jar.depends">
+		<description>
+			Create a minimal distribution jar, excluding RRD4J features
+		</description>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Generate signing key and sign the jar file                       -->
+	<!-- ================================================================ -->
+	<target name="genkey">
+		<genkey alias="${project.alias}" storepass="${project.password}" keystore="${project.keystore}">
+			<dname>
+				<param name="CN" value="${project.alias}" />
+				<param name="O" value="${project.O}" />
+				<param name="C" value="${project.C}" />
+			</dname>
+		</genkey>
+	</target>
+
+	<target name="sign" depends="jar">
+		<signjar jar="${jar.dir}/${jajar.name}" alias="${project.alias}" storepass="${project.password}" signedjar="${jar.dir}/${project.name}-signed.jar" keystore="${project.keystore}" />
+	</target>
+</project>
