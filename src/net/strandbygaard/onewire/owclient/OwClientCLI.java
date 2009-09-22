@@ -1,8 +1,27 @@
+/**
+ * Module: owclient/java
+ * 
+ * Copyright (C) 2009 Martin Strandbygaard
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.strandbygaard.onewire.owclient;
 
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
+import java.util.List;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -12,11 +31,35 @@ import org.owfs.ownet.OWNet;
 
 public class OwClientCLI {
 
+	private long start = 0;
+	private long stop = 0;
+	protected String[] args;
+
+	public OwClientCLI(String[] args) {
+		this.args = args;
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		OwClientCLI owc = new OwClientCLI(args);
+		owc.startTimer();
+		owc.process();
+		owc.stopTimer();
+		owc.printRuntime();
+
+	}
+
+	public void printRuntime() {
+		System.out.println("Operation completed in: "
+				+ (((((double) stop) - ((double) start)) / 1000)) + "s");
+	}
+
+	public void process() {
 		OwClient owc = null;
+		OWNet ownet;
+
 		final OptionParser parser = new OptionParser();
 		OptionSpec<String> host = parser.acceptsAll(asList("h", "host"),
 				"Address of owserver.").withRequiredArg().ofType(String.class);
@@ -46,7 +89,6 @@ public class OwClientCLI {
 			}
 		}
 
-		OWNet ownet;
 		if (options.has(host)) {
 			if (options.has(port)) {
 				ownet = new OWNet(options.valueOf(host), options.valueOf(port));
@@ -63,11 +105,6 @@ public class OwClientCLI {
 				ownet = new OWNet("127.0.0.1", 4304);
 				owc = new OwClient(ownet);
 			}
-		}
-
-		String[] str = owc.dir("/1F.16E103000000/main/26.373BB6000000");
-		for (String s : str) {
-			System.out.println(s);
 		}
 
 		if (options.has("id")) {
@@ -94,6 +131,22 @@ public class OwClientCLI {
 			} catch (UnsupportedDeviceException e) {
 				e.printStackTrace();
 			}
+			return;
 		}
+		if (options.has("all")) {
+			List<OwDevice> devices = owc.list();
+			for (OwDevice owd : devices) {
+				System.out.print(owd.getId() + ": ");
+				System.out.println(owd.toString());
+			}
+		}
+	}
+
+	private void startTimer() {
+		start = System.currentTimeMillis();
+	}
+
+	private void stopTimer() {
+		stop = System.currentTimeMillis();
 	}
 }

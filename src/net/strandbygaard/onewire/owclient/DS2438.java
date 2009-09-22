@@ -25,7 +25,6 @@ public class DS2438 extends OwDeviceImpl {
 	public static final String HUMIDITY = "/humidity";
 	private double temperature;
 	private double humidity;
-	
 
 	public DS2438(String path, OwClient owc) {
 		super(path, owc);
@@ -41,23 +40,22 @@ public class DS2438 extends OwDeviceImpl {
 		read();
 		return temperature;
 	}
-	
+
 	public double getHumidity() {
 		read();
 		return humidity;
 	}
-	
 
 	public String getUnit() {
 		return "C";
 	}
 
 	@Override
-	protected void update() {
+	public void update() {
 		if (canUpdate()) {
 			if (shouldUpdate()) {
-				setTemperature(Double.valueOf(owc.read(path+TEMPERATURE)));
-				setHumidity(Double.valueOf(owc.read(path+HUMIDITY)));
+				setTemperature(Double.valueOf(owc.read(path + TEMPERATURE)));
+				setHumidity(Double.valueOf(owc.read(path + HUMIDITY)));
 				super.update();
 			}
 		}
@@ -73,6 +71,7 @@ public class DS2438 extends OwDeviceImpl {
 
 	@Override
 	public String toString() {
-		return String.valueOf(getTemperature()) + getUnit() + " " + String.valueOf(getHumidity()) + "%";
+		return String.valueOf(getTemperature()) + getUnit() + " "
+				+ String.valueOf(getHumidity()) + "%";
 	}
 }

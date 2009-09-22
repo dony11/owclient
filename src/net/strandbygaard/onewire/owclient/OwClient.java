@@ -67,7 +67,6 @@ public class OwClient {
 	public List<OwDevice> list() {
 		String[] in = { "/" };
 		List<OwDevice> list = list("*", in, null, null);
-		System.err.println(list.size());
 		return list;
 	}
 
@@ -95,7 +94,6 @@ public class OwClient {
 	public List<OwDevice> list(String familyCode, String path) {
 		String[] in = { path }; // TODO Check valid path
 		List<OwDevice> list = list("*", in, null, null);
-		System.err.println(list.size());
 		return list;
 	}
 

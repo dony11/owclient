@@ -16,50 +16,38 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.strandbygaard.onewire.owclient;
 
-public class DS18S20 extends OwDeviceImpl {
+import junit.framework.TestCase;
 
-	public static final String TEMPERATURE = "/temperature";
-	private double temperature;
-
-	public DS18S20(String path, OwClient owc) {
-		super(path, owc);
-	}
+public class OwDeviceFactoryTest extends TestCase {
 
 	@Override
-	public double read() {
-		update();
-		return temperature;
+	protected void setUp() throws Exception {
+		super.setUp();
 	}
 
-	public double getTemperature() {
-		read();
-		return temperature;
+	public void testCanCreate1() {
+		boolean expected = true;
+		boolean actual = OwDeviceFactory.canCreate("10");
+		assertEquals(expected, actual);
 	}
 
-	public String getUnit() {
-		return "C";
+	public void testCanCreate2() {
+		boolean expected = true;
+		boolean actual = OwDeviceFactory.canCreate("26");
+		assertEquals(expected, actual);
 	}
 
-	@Override
-	public void update() {
-		if (canUpdate()) {
-			if (shouldUpdate()) {
-				setTemperature(Double.valueOf(owc.read(path + TEMPERATURE)));
-				super.update();
-			}
-		}
+	public void testCanCreate3() {
+		boolean expected = true;
+		boolean actual = OwDeviceFactory.canCreate("1F");
+		assertEquals(expected, actual);
 	}
 
-	private void setTemperature(double temp) {
-		temperature = temp;
+	public void testCanCreate4() {
+		boolean expected = true;
+		boolean actual = OwDeviceFactory.canCreate("81");
+		assertEquals(expected, actual);
 	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(read()) + getUnit();
-	}
-
 }

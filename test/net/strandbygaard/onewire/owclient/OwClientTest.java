@@ -1,3 +1,21 @@
+/**
+ * Module: owclient/java
+ * 
+ * Copyright (C) 2009 Martin Strandbygaard
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.strandbygaard.onewire.owclient;
 
 import static org.mockito.Mockito.mock;
@@ -11,95 +29,6 @@ import org.owfs.ownet.OWNet;
 
 public class OwClientTest extends TestCase {
 
-	final static String[] rootPaths = { "/1F.16E103000000", "/1F.A3E903000000",
-			"/1F.AFE103000000", "/bus.0", "/uncached", "/settings", "/system",
-			"/statistics", "/structure" };
-
-	/*
-	 * /1F.16E103000000/address /1F.16E103000000/aux
-	 * /1F.16E103000000/branch.BYTE /1F.16E103000000/branch.ALL
-	 * /1F.16E103000000/branch.0 /1F.16E103000000/branch.1
-	 * /1F.16E103000000/clearevent /1F.16E103000000/control
-	 * /1F.16E103000000/crc8 /1F.16E103000000/discharge
-	 * /1F.16E103000000/event.BYTE /1F.16E103000000/event.ALL
-	 * /1F.16E103000000/event.0 /1F.16E103000000/event.1 /1F.16E103000000/family
-	 * /1F.16E103000000/id /1F.16E103000000/locator /1F.16E103000000/main
-	 * /1F.16E103000000/present /1F.16E103000000/r_address /1F.16E103000000/r_id
-	 * /1F.16E103000000/r_locator /1F.16E103000000/sensed.BYTE
-	 * /1F.16E103000000/sensed.ALL /1F.16E103000000/sensed.0
-	 * /1F.16E103000000/sensed.1 /1F.16E103000000/type
-	 */
-	final static String[] portLocalPaths = { "/1F.16E103000000/address",
-			"/1F.16E103000000/id", "/1F.16E103000000/main" };
-
-	final static String[] portAttachedPaths = {
-			"/1F.16E103000000/main/10.16438A010800",
-			"/1F.16E103000000/main/26.373BB6000000",
-			"/1F.16E103000000/main/81.851428000000",
-			"/1F.16E103000000/main/1F.16E103000000",
-			"/1F.16E103000000/main/1F.A3E903000000",
-			"/1F.16E103000000/main/1F.AFE103000000",
-			"/1F.16E103000000/main/simultaneous", "/1F.16E103000000/main/alarm" };
-
-	/*
-	 * /1F.16E103000000/main/10.16438A010800/address
-	 * /1F.16E103000000/main/10.16438A010800/crc8
-	 * /1F.16E103000000/main/10.16438A010800/die
-	 * /1F.16E103000000/main/10.16438A010800/family
-	 * /1F.16E103000000/main/10.16438A010800/id
-	 * /1F.16E103000000/main/10.16438A010800/locator
-	 * /1F.16E103000000/main/10.16438A010800/power
-	 * /1F.16E103000000/main/10.16438A010800/present
-	 * /1F.16E103000000/main/10.16438A010800/r_address
-	 * /1F.16E103000000/main/10.16438A010800/r_id
-	 * /1F.16E103000000/main/10.16438A010800/r_locator
-	 * /1F.16E103000000/main/10.16438A010800/temperature
-	 * /1F.16E103000000/main/10.16438A010800/temphigh
-	 * /1F.16E103000000/main/10.16438A010800/templow
-	 * /1F.16E103000000/main/10.16438A010800/trim
-	 * /1F.16E103000000/main/10.16438A010800/trimblanket
-	 * /1F.16E103000000/main/10.16438A010800/trimvalid
-	 * /1F.16E103000000/main/10.16438A010800/type
-	 */
-	final static String[] sensorDS18S20Reading = {
-			"/1F.16E103000000/main/10.16438A010800/temperature",
-			"/1F.16E103000000/main/10.16438A010800/address" };
-
-	/*
-	 * /1F.16E103000000/main/26.373BB6000000/CA
-	 * /1F.16E103000000/main/26.373BB6000000/EE
-	 * /1F.16E103000000/main/26.373BB6000000/HIH4000
-	 * /1F.16E103000000/main/26.373BB6000000/HTM1735
-	 * /1F.16E103000000/main/26.373BB6000000/IAD
-	 * /1F.16E103000000/main/26.373BB6000000/MultiSensor
-	 * /1F.16E103000000/main/26.373BB6000000/VAD
-	 * /1F.16E103000000/main/26.373BB6000000/VDD
-	 * /1F.16E103000000/main/26.373BB6000000/address
-	 * /1F.16E103000000/main/26.373BB6000000/crc8
-	 * /1F.16E103000000/main/26.373BB6000000/date
-	 * /1F.16E103000000/main/26.373BB6000000/disconnect
-	 * /1F.16E103000000/main/26.373BB6000000/endcharge
-	 * /1F.16E103000000/main/26.373BB6000000/family
-	 * /1F.16E103000000/main/26.373BB6000000/humidity
-	 * /1F.16E103000000/main/26.373BB6000000/id
-	 * /1F.16E103000000/main/26.373BB6000000/locator
-	 * /1F.16E103000000/main/26.373BB6000000/offset
-	 * /1F.16E103000000/main/26.373BB6000000/pages
-	 * /1F.16E103000000/main/26.373BB6000000/present
-	 * /1F.16E103000000/main/26.373BB6000000/r_address
-	 * /1F.16E103000000/main/26.373BB6000000/r_id
-	 * /1F.16E103000000/main/26.373BB6000000/r_locator
-	 * /1F.16E103000000/main/26.373BB6000000/temperature
-	 * /1F.16E103000000/main/26.373BB6000000/type
-	 * /1F.16E103000000/main/26.373BB6000000/udate
-	 * /1F.16E103000000/main/26.373BB6000000/vis
-	 */
-	final static String[] sensorDS2438Reading = {
-			"/1F.16E103000000/main/26.373BB6000000/humidity",
-			"/1F.16E103000000/main/26.373BB6000000/temperature",
-			"/1F.16E103000000/main/26.373BB6000000/address" };
-
-	final static int TOTALDEVICES = 3;
 	private OWNet mockedOWNet;
 	private OwClient owc;
 
@@ -108,17 +37,18 @@ public class OwClientTest extends TestCase {
 		super.setUp();
 
 		mockedOWNet = mock(OWNet.class);
-		when(mockedOWNet.Dir("/")).thenReturn(rootPaths);
-		when(mockedOWNet.DirAll("/")).thenReturn(rootPaths);
+		when(mockedOWNet.Dir("/")).thenReturn(OwClientTestData.rootPaths);
+		when(mockedOWNet.DirAll("/")).thenReturn(OwClientTestData.rootPaths);
 
-		when(mockedOWNet.DirAll("/1F.16E103000000")).thenReturn(portLocalPaths);
-		when(mockedOWNet.DirAll("/1F.16E103000000/"))
-				.thenReturn(portLocalPaths);
+		when(mockedOWNet.DirAll("/1F.16E103000000")).thenReturn(
+				OwClientTestData.portLocalPaths);
+		when(mockedOWNet.DirAll("/1F.16E103000000/")).thenReturn(
+				OwClientTestData.portLocalPaths);
 
 		when(mockedOWNet.DirAll("/1F.16E103000000/main")).thenReturn(
-				portAttachedPaths);
+				OwClientTestData.portAttachedPaths);
 		when(mockedOWNet.DirAll("/1F.16E103000000/main/")).thenReturn(
-				portAttachedPaths);
+				OwClientTestData.portAttachedPaths);
 		when(
 				mockedOWNet
 						.Read("/1F.16E103000000/main/10.16438A010800/temperature"))
@@ -177,39 +107,48 @@ public class OwClientTest extends TestCase {
 	}
 
 	public void testDirAnExistingPath() {
-		assertEquals(owc.dir("/"), rootPaths);
+		String[] expected = OwClientTestData.rootPaths;
+		String[] actual = owc.dir("/");
+		assertEquals(expected, actual);
 	}
 
 	public void testDirANonExistingPath() {
-		String[] str = null;
-		assertEquals(owc.dir(""), str);
+		String[] expected = null;
+		String[] actual = owc.dir("");
+		assertEquals(expected, actual);
 	}
 
 	public void testReadAnAttachedDevice() {
-		assertEquals(owc
-				.read("/1F.16E103000000/main/10.16438A010800/temperature"),
-				"20",
-				owc.read("/1F.16E103000000/main/10.16438A010800/temperature"));
+		String expected = "20";
+		String actual = owc
+				.read("/1F.16E103000000/main/10.16438A010800/temperature");
+		assertEquals(expected, actual);
 	}
 
 	public void testReadANotAttachedDevice() {
-		assertEquals(null, null, owc
-				.read("/1F.16E103000000/main/10.xxxxxxxxxxxx/temperature"));
+		String expected = null;
+		String actual = owc
+				.read("/1F.16E103000000/main/10.xxxxxxxxxxxx/temperature");
+		assertEquals(expected, actual);
 	}
 
 	public void testReadNonExistingPath1() {
-		assertEquals(null, null, owc
-				.read("/1F.16E103000000/main/10.xxxxxxxxxxxx/temperature"));
+		String expected = null;
+		String actual = owc
+				.read("/1F.16E103000000/main/10.xxxxxxxxxxxx/temperature");
+		assertEquals(expected, actual);
 	}
 
 	public void testReadNonExistingPath2() {
-		assertEquals(null, null, owc.read("/1F.16E103000000/abcdefg"));
+		String expected = null;
+		String actual = owc.read("/1F.16E103000000/abcdefg");
+		assertEquals(expected, actual);
 	}
 
 	public void testListAllAttachedDevices() {
 		List<OwDevice> deviceList = owc.list();
 
-		assertEquals(deviceList.size(), TOTALDEVICES);
+		assertEquals(deviceList.size(), OwClientTestData.TOTALDEVICES);
 	}
 
 	public void testListNoAttachedDevices() throws Exception {
@@ -217,58 +156,82 @@ public class OwClientTest extends TestCase {
 		String[] str = null;
 		when(tempOWNet.Dir("/")).thenReturn(str);
 		when(tempOWNet.DirAll("/")).thenReturn(str);
-
 		when(tempOWNet.DirAll("/1F.16E103000000")).thenReturn(str);
 		when(tempOWNet.DirAll("/1F.16E103000000/")).thenReturn(str);
-
 		when(tempOWNet.DirAll("/1F.16E103000000/main")).thenReturn(str);
 		when(tempOWNet.DirAll("/1F.16E103000000/main/")).thenReturn(str);
 
 		OwClient tempClient = new OwClient(tempOWNet);
 
-		assertEquals(tempClient.list().size(), 0);
+		int expected = 0;
+		int actual = tempClient.list().size();
+		assertEquals(expected, actual);
 	}
 
 	public void testListSingleDeviceType() throws UnsupportedDeviceException {
 		List<OwDevice> list = owc.list("10");
-		assertEquals(list.size(), 1);
+		int expected = 1;
+		int actual = list.size();
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithSupportedFamCode1() {
-		assertEquals(true, OwClient.isSupported("10"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupported("10");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithSupportedFamCode2() {
-		assertEquals(true, OwClient.isSupported("1F"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupported("1F");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithSupportedFamCode3() {
-		assertEquals(true, OwClient.isSupported("26"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupported("26");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithSupportedFamCode4() {
-		assertEquals(true, OwClient.isSupported("81"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupported("81");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithSupportedDeviceId() {
-		assertEquals(true, OwClient.isSupported("10.16438A010800"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupported("10.16438A010800");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedWithNotSupportedDevice() {
-		assertEquals(false, OwClient.isSupported("xx"));
+		boolean expected = false;
+		boolean actual = OwClient.isSupported("xx");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedSensorWithSupportedDeviceId() {
-		assertEquals(true, OwClient.isSupportedSensor("10.16438A010800"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupportedSensor("10.16438A010800");
+		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedSensorWithSupportedFamCode() {
-		assertEquals(true, OwClient.isSupportedSensor("26"));
-		assertEquals(true, OwClient.isSupportedSensor("81"));
+		boolean expected = true;
+		boolean actual = OwClient.isSupportedSensor("26");
+		assertEquals(expected, actual);
 	}
 
-	public void testIsSupportedSensorWithNotSupportedDevice() {
-		assertEquals(false, OwClient.isSupportedSensor("xx"));
-		assertEquals(false, OwClient.isSupportedSensor("1F"));
+	public void testIsSupportedSensorWithNotSupportedDevice1() {
+		boolean expected = false;
+		boolean actual = OwClient.isSupportedSensor("1F");
+		assertEquals(expected, actual);
+	}
+
+	public void testIsSupportedSensorWithNotSupportedDevice2() {
+		boolean expected = false;
+		boolean actual = OwClient.isSupportedSensor("xx");
+		assertEquals(expected, actual);
 	}
 }

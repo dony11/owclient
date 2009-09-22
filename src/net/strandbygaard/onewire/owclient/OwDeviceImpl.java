@@ -22,13 +22,16 @@ package net.strandbygaard.onewire.owclient;
 public abstract class OwDeviceImpl implements OwDevice {
 
 	public static final long UPDATE_INTERVAL = 1;
-	
+
 	protected String id;
 	protected String path;
 	protected long lastUpdate;
 	protected OwClient owc;
 
 	public OwDeviceImpl(String path, OwClient owc) {
+		if (path.endsWith("/")) {
+			path = path.substring(0, path.length() - 1);
+		}
 		this.path = path;
 		this.owc = owc;
 		this.id = path.substring(path.lastIndexOf("/") + 1);
@@ -46,11 +49,10 @@ public abstract class OwDeviceImpl implements OwDevice {
 	public String getPath() {
 		return path;
 	}
-	
+
 	public long getLastUpdate() {
 		return 0;
 	}
-
 
 	public boolean canUpdate() {
 		boolean state = false;
@@ -68,10 +70,15 @@ public abstract class OwDeviceImpl implements OwDevice {
 		}
 		return state;
 	}
-	
-	protected void update() {
+
+	public void update() {
 		lastUpdate = System.currentTimeMillis();
 	}
 
 	public abstract double read();
+
+	@Override
+	public String toString() {
+		return this.id;
+	}
 }

@@ -16,50 +16,22 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.strandbygaard.onewire.owclient;
 
-public class DS18S20 extends OwDeviceImpl {
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-	public static final String TEMPERATURE = "/temperature";
-	private double temperature;
+public class AllTests {
 
-	public DS18S20(String path, OwClient owc) {
-		super(path, owc);
-	}
-
-	@Override
-	public double read() {
-		update();
-		return temperature;
-	}
-
-	public double getTemperature() {
-		read();
-		return temperature;
-	}
-
-	public String getUnit() {
-		return "C";
-	}
-
-	@Override
-	public void update() {
-		if (canUpdate()) {
-			if (shouldUpdate()) {
-				setTemperature(Double.valueOf(owc.read(path + TEMPERATURE)));
-				super.update();
-			}
-		}
-	}
-
-	private void setTemperature(double temp) {
-		temperature = temp;
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(read()) + getUnit();
+	public static Test suite() {
+		TestSuite suite = new TestSuite(
+				"Test for net.strandbygaard.onewire.owclient");
+		// $JUnit-BEGIN$
+		suite.addTestSuite(OwClientTest.class);
+		suite.addTestSuite(DS2438Test.class);
+		suite.addTestSuite(DS18S20Test.class);
+		// $JUnit-END$
+		return suite;
 	}
 
 }
