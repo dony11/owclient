@@ -39,6 +39,9 @@
 		Ant build file to create owclient artifiacts.
 	</description>
 
+	<property name="compiler.verbose" value="false" />
+	<property name="compiler.debug" value="true" />
+
 	<property name="project.name" value="owclient" />
 	<property name="project.keystore" value="${res.dir}/project.keystore" />
 	<property name="project.alias" value="owclient" />
@@ -52,6 +55,7 @@
 	<property name="src.dir" value="src" />
 
 	<property name="build.dir" value="build" />
+	<property name="build.unzip.dir" value="${build.dir}/unzip"/>
 	<property name="jar.dir" value="${build.dir}/jar" />
 
 	<property name="lib.dir" value="lib" />
@@ -71,15 +75,8 @@
 		<delete dir="${jar.dir}" />
 		<delete dir="${class.dir}" />
 		<delete dir="${bin.dir}" />
-		<delete dir="${lib.org.dir}" />
-		<delete dir="${lib.com.dir}" />
-
-		<unzip dest="${lib.dir}">
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar" />
-			</fileset>
-		</unzip>
-		<delete dir="${lib.dir}/META-INF" />
+		<delete dir="${build.unzip.dir}" />
+		
 	</target>
 
 	<!-- ================================================================ 
@@ -99,12 +96,13 @@
 		<description>
 		Compiles the sources
 		</description>
+
 		<mkdir dir="${class.dir}" />
-		<javac destdir="${class.dir}" classpathref="build.classpath">
+		<javac destdir="${class.dir}" verbose="${compiler.verbose}" debug="${compiler.debug}" 
+			classpathref="build.classpath" source="1.5" encoding="utf-8">
 			<src path="${src.dir}" />
 		</javac>
 	</target>
-
 
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
           target: jar.depends  
@@ -119,6 +117,13 @@
 				<include name="*" />
 			</fileset>
 		</delete>
+		
+		<mkdir dir="${build.unzip.dir}" />
+		<unzip dest="${build.unzip.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</unzip>
 	</target>
 
 
@@ -131,9 +136,7 @@
 		</description>
 
 		<jar basedir="${class.dir}" jarfile="${jar.dir}/${project.name}.jar">
-			<fileset dir="${lib.dir}" includes="**/*.class" />
-			<!-- fileset dir="${src.dir}" includes="**/xml/*" />
-			<fileset dir="." includes="**/img/*"/ -->
+			<fileset dir="${build.unzip.dir}" includes="**/*.class" />
 			<manifest>
 				<attribute name="Built-By" value="Martin Strandbygaard" />
 				<attribute name="Build-Date" value="${DSTAMP}" />
