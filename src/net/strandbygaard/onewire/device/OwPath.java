@@ -1,4 +1,4 @@
-﻿package net.strandbygaard.onewire.device;
+package net.strandbygaard.onewire.device;
 
 public class OwPath extends OwItem {
 

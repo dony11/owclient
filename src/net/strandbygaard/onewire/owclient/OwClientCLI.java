@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module: owclient/java
  * 
  * Copyright (C) 2009 Martin Strandbygaard
@@ -44,10 +44,7 @@ public class OwClientCLI {
 	 */
 	public static void main(String[] args) {
 		OwClientCLI owc = new OwClientCLI(args);
-		owc.startTimer();
 		owc.process();
-		owc.stopTimer();
-		owc.printRuntime();
 	}
 
 	public void printRuntime() {
@@ -56,6 +53,7 @@ public class OwClientCLI {
 	}
 
 	public void process() {
+		this.startTimer();
 		OwClient owc = null;
 		OWNet ownet;
 
@@ -70,6 +68,7 @@ public class OwClientCLI {
 				String.class);
 		parser.acceptsAll(asList("temp", "temperature"),
 				"Output temperature reading of specified device");
+		parser.acceptsAll(asList("time"), "Output runtime of command");
 		parser.acceptsAll(asList("hum", "humidity"),
 				"Output humidity reading of specified device");
 		parser.acceptsAll(asList("a", "all"),
@@ -138,6 +137,11 @@ public class OwClientCLI {
 				System.out.print(owd.getId() + ": ");
 				System.out.println(owd.toString());
 			}
+		}
+
+		this.stopTimer();
+		if (options.has("time")) {
+			this.printRuntime();
 		}
 	}
 

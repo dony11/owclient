@@ -1,4 +1,4 @@
-﻿ /**
+ /**
   * Module: ownet/java
   * Package: org.owfs.ownet.OWNet
   *

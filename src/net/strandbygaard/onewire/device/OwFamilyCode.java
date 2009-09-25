@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module: owbus/java
  * 
  * Copyright (C) 2009 Martin Strandbygaard
