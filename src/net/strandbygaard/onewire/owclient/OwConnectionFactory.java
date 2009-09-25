@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Module: owbus/java
  * Package: net.strandbygaard.onewire.owbus.OwConnectionFactory
  *  

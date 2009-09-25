@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Module: owbus/java
  * 
  * Copyright (C) 2009 Martin Strandbygaard
@@ -21,5 +21,4 @@ package net.strandbygaard.onewire.device;
 
 public class OwFamilyCode {
 
-	
 }
