@@ -27,6 +27,8 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import net.strandbygaard.onewire.owclient.OwDevice.Reading;
+
 import org.owfs.ownet.OWNet;
 
 public class OwClientCLI {
@@ -110,16 +112,16 @@ public class OwClientCLI {
 				OwDevice device = owc.find(options.valueOf(id));
 				if (options.has("temperature")) {
 					if (device.getClass() == DS18S20.class) {
-						System.out.print(((DS18S20) device).getTemperature());
+						System.out.print(((DS18S20) device).read(Reading.TEMP));
 					}
 					if (device.getClass() == DS2438.class) {
-						System.out.print(((DS2438) device).getTemperature());
+						System.out.print(((DS2438) device).read(Reading.TEMP));
 					}
 				}
 
 				if (options.has("humidity")) {
 					if (device.getClass() == DS2438.class) {
-						System.out.print(((DS2438) device).getHumidity());
+						System.out.print(((DS2438) device).read(Reading.HUM));
 					}
 				}
 			} catch (IllegalArgumentException e) {

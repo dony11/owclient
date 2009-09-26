@@ -21,13 +21,17 @@ package net.strandbygaard.onewire.owclient;
 
 public interface OwDevice {
 
+	public static enum Reading {
+		TEMP, HUM
+	};
+	
 	String getId();
 
 	String getPath();
 	
 	long getLastUpdate();
 	
-	double read();
+	double read(Reading r);
 	
 	boolean canUpdate();
 

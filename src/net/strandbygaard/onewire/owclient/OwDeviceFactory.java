@@ -68,7 +68,7 @@ public class OwDeviceFactory {
 		if (id.equalsIgnoreCase("81")) {
 			dev = new OwDeviceImpl(path, owc) {
 				@Override
-				public double read() {
+				public double read(Reading r) {
 					return 0;
 				}
 			};

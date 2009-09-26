@@ -31,23 +31,27 @@ public class DS2438 extends OwDeviceImpl {
 	}
 
 	@Override
-	public double read() {
+	public double read(Reading r) {
 		update();
-		return temperature;
+		double val = 0;
+		if (r == Reading.TEMP) {
+			val = temperature;
+		}
+		if (r == Reading.HUM) {
+			val = humidity;
+		}
+		return val;
 	}
 
-	public double getTemperature() {
-		read();
-		return temperature;
-	}
-
-	public double getHumidity() {
-		read();
-		return humidity;
-	}
-
-	public String getUnit() {
-		return "C";
+	public String getUnit(Reading r) {
+		String unit = "";
+		if (r == Reading.TEMP) {
+			unit = "C";
+		}
+		if (r == Reading.HUM) {
+			unit = "%";
+		}
+		return unit;
 	}
 
 	@Override
@@ -71,7 +75,7 @@ public class DS2438 extends OwDeviceImpl {
 
 	@Override
 	public String toString() {
-		return String.valueOf(getTemperature()) + getUnit() + " "
-				+ String.valueOf(getHumidity()) + "%";
+		return String.valueOf(read(Reading.TEMP)) + getUnit(Reading.TEMP) + " "
+				+ String.valueOf(read(Reading.HUM)) + getUnit(Reading.HUM);
 	}
 }

@@ -29,13 +29,8 @@ public class DS18S20 extends OwDeviceImpl {
 	}
 
 	@Override
-	public double read() {
+	public double read(Reading r) {
 		update();
-		return temperature;
-	}
-
-	public double getTemperature() {
-		read();
 		return temperature;
 	}
 
@@ -59,7 +54,7 @@ public class DS18S20 extends OwDeviceImpl {
 
 	@Override
 	public String toString() {
-		return String.valueOf(read()) + getUnit();
+		return String.valueOf(read(Reading.TEMP)) + getUnit();
 	}
 
 }

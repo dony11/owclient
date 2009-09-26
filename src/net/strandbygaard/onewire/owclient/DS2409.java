@@ -28,7 +28,7 @@ public class DS2409 extends OwDeviceImpl {
 	}
 
 	@Override
-	public double read() {
+	public double read(Reading r) {
 		return 0;
 	}
 

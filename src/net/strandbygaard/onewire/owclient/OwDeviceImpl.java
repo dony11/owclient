@@ -75,7 +75,7 @@ public abstract class OwDeviceImpl implements OwDevice {
 		lastUpdate = System.currentTimeMillis();
 	}
 
-	public abstract double read();
+	public abstract double read(Reading r);
 
 	@Override
 	public String toString() {

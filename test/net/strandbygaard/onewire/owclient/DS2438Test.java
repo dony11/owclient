@@ -20,6 +20,7 @@ package net.strandbygaard.onewire.owclient;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import net.strandbygaard.onewire.owclient.OwDevice.Reading;
 import junit.framework.TestCase;
 
 public class DS2438Test extends TestCase {
@@ -65,27 +66,27 @@ public class DS2438Test extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testRead() {
+	public void testRead1() {
 		double expected = 20.0;
-		double actual = owd.read();
+		double actual = owd.read(Reading.TEMP);
 		assertEquals(expected, actual);
 	}
 
-	public void testGetTemperature() {
-		double expected = 20.0;
-		double actual = ((DS2438) owd).getTemperature();
-		assertEquals(expected, actual);
-	}
-
-	public void testGetHumidity() {
+	public void testRead2() {
 		double expected = 60.0;
-		double actual = ((DS2438) owd).getHumidity();
+		double actual = owd.read(Reading.HUM);
 		assertEquals(expected, actual);
 	}
 
-	public void testGetUnit() {
+	public void testGetUnit1() {
 		String expected = "C";
-		String actual = ((DS2438) owd).getUnit();
+		String actual = ((DS2438) owd).getUnit(Reading.TEMP);
+		assertEquals(expected, actual);
+	}
+
+	public void testGetUnit2() {
+		String expected = "%";
+		String actual = ((DS2438) owd).getUnit(Reading.HUM);
 		assertEquals(expected, actual);
 	}
 

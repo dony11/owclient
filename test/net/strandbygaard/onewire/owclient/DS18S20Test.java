@@ -20,6 +20,7 @@ package net.strandbygaard.onewire.owclient;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import net.strandbygaard.onewire.owclient.OwDevice.Reading;
 import junit.framework.TestCase;
 
 public class DS18S20Test extends TestCase {
@@ -66,13 +67,7 @@ public class DS18S20Test extends TestCase {
 
 	public void testRead() {
 		double expected = 20.0;
-		double actual = owd.read();
-		assertEquals(expected, actual);
-	}
-
-	public void testGetTemperature() {
-		double expected = 20.0;
-		double actual = ((DS18S20) owd).getTemperature();
+		double actual = owd.read(Reading.TEMP);
 		assertEquals(expected, actual);
 	}
 
