@@ -19,7 +19,7 @@
 
 package net.strandbygaard.onewire.owclient;
 
-public class DS18S20 extends OwDeviceImpl {
+public class DS18S20 extends OwSensorImpl {
 
 	public static final String TEMPERATURE = "/temperature";
 	private double temperature;
@@ -28,14 +28,27 @@ public class DS18S20 extends OwDeviceImpl {
 		super(path, owc);
 	}
 
+	public boolean canRead(Reading r) {
+		boolean canRead = true;
+		if (r != Reading.TEMP) {
+			canRead = false;
+		}
+		return canRead;
+	}
+
 	@Override
 	public double read(Reading r) {
 		update();
+
 		return temperature;
 	}
 
-	public String getUnit() {
-		return "C";
+	public String getUnit(Reading r) {
+		String unit = "";
+		if (r == Reading.TEMP) {
+			unit = "C";
+		}
+		return unit;
 	}
 
 	@Override
@@ -54,7 +67,6 @@ public class DS18S20 extends OwDeviceImpl {
 
 	@Override
 	public String toString() {
-		return String.valueOf(read(Reading.TEMP)) + getUnit();
+		return String.valueOf(read(Reading.TEMP)) + getUnit(Reading.TEMP);
 	}
-
 }

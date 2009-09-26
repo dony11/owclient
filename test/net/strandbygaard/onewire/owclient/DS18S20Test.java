@@ -20,12 +20,13 @@ package net.strandbygaard.onewire.owclient;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import net.strandbygaard.onewire.owclient.OwDevice.Reading;
 import junit.framework.TestCase;
+import net.strandbygaard.onewire.owclient.OwSensor.Reading;
+import net.strandbygaard.onewire.owclient.OwSensor.Unit;
 
 public class DS18S20Test extends TestCase {
 
-	private OwDevice owd;
+	private OwSensor owd;
 	private OwClient owc;
 
 	private static final String DEVICEID = "10.16438A010800";
@@ -34,12 +35,11 @@ public class DS18S20Test extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-
+		
 		owc = mock(OwClient.class);
 		when(owc.read(DEVICEPATH + DS18S20.TEMPERATURE)).thenReturn("20.0");
 
 		owd = new DS18S20(DEVICEPATH, owc);
-
 	}
 
 	public void testCanUpdate() {
@@ -65,6 +65,18 @@ public class DS18S20Test extends TestCase {
 		assertEquals(expected, actual);
 	}
 
+	public void testCanRead1() {
+		boolean expected = true;
+		boolean actual = owd.canRead(Reading.TEMP);
+		assertEquals(expected, actual);
+	}
+	
+	public void testCanRead2() {
+		boolean expected = false;
+		boolean actual = owd.canRead(Reading.HUM);
+		assertEquals(expected, actual);
+	}
+	
 	public void testRead() {
 		double expected = 20.0;
 		double actual = owd.read(Reading.TEMP);
@@ -73,7 +85,7 @@ public class DS18S20Test extends TestCase {
 
 	public void testGetUnit() {
 		String expected = "C";
-		String actual = ((DS18S20) owd).getUnit();
+		String actual = ((DS18S20) owd).getUnit(Reading.TEMP);
 		assertEquals(expected, actual);
 	}
 

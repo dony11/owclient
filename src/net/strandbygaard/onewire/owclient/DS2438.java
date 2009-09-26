@@ -19,7 +19,7 @@
 
 package net.strandbygaard.onewire.owclient;
 
-public class DS2438 extends OwDeviceImpl {
+public class DS2438 extends OwSensorImpl {
 
 	public static final String TEMPERATURE = "/temperature";
 	public static final String HUMIDITY = "/humidity";
@@ -28,6 +28,14 @@ public class DS2438 extends OwDeviceImpl {
 
 	public DS2438(String path, OwClient owc) {
 		super(path, owc);
+	}
+
+	public boolean canRead(Reading r) {
+		boolean canRead = true;
+		if (r != Reading.TEMP && r != Reading.HUM) {
+			canRead = false;
+		}
+		return canRead;
 	}
 
 	@Override

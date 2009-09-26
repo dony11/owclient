@@ -65,17 +65,28 @@ public class OwClientTest extends TestCase {
 		assertNotNull(owc.find("26.373BB6000000"));
 	}
 
-	public void testFindAttachedDevice3() throws Exception {
-		assertNotNull(owc.find("81.851428000000"));
+	public void testFindAttachedNotSuppportedDevice1() throws Exception {
+		OwSensor owd = null;
+		try {
+			owd = owc.find("81.851428000000");
+		} catch (UnsupportedDeviceException e) {
+			e.printStackTrace();
+		}
+		assertNull(owd);
 	}
 
-	public void testFindAttachedDevice4() throws Exception {
-		assertNotNull(owc.find("1F.16E103000000"));
+	public void testFindAttachedNotSuppportedDevice2() throws Exception {
+		OwSensor owd = null;
+		try {
+			owd = owc.find("1F.16E103000000");
+		} catch (UnsupportedDeviceException e) {
+			e.printStackTrace();
+		}
+		assertNull(owd);
 	}
 
-	public void testFindNotAttachedDevice1() throws IllegalArgumentException,
-			UnsupportedDeviceException {
-		OwDevice owd = null;
+	public void testFindNotAttachedDevice1() throws Exception {
+		OwSensor owd = null;
 		try {
 			owd = owc.find("10.xxxxxxxxxxxx");
 		} catch (DeviceNotFoundException e) {
@@ -86,7 +97,7 @@ public class OwClientTest extends TestCase {
 
 	public void testFindNotAttachedDevice2() throws IllegalArgumentException,
 			UnsupportedDeviceException {
-		OwDevice owd = null;
+		OwSensor owd = null;
 		try {
 			owd = owc.find("10");
 		} catch (DeviceNotFoundException e) {
@@ -97,7 +108,7 @@ public class OwClientTest extends TestCase {
 
 	public void testFindNotAttachedDevice3() throws IllegalArgumentException,
 			UnsupportedDeviceException {
-		OwDevice owd = null;
+		OwSensor owd = null;
 		try {
 			owd = owc.find("10.");
 		} catch (DeviceNotFoundException e) {
@@ -145,10 +156,18 @@ public class OwClientTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testListAllAttachedDevices() {
-		List<OwDevice> deviceList = owc.list();
+	public void testListAllAttachedDevices1() {
+		List<OwSensor> deviceList = owc.list();
 
 		assertEquals(deviceList.size(), OwClientTestData.TOTALDEVICES);
+	}
+
+	public void testListAllAttachedDevices2() {
+		List<OwSensor> deviceList = owc.list();
+		
+		for (OwSensor dev : deviceList) {
+			assertNotNull(dev);
+		}
 	}
 
 	public void testListNoAttachedDevices() throws Exception {
@@ -168,8 +187,15 @@ public class OwClientTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testListSingleDeviceType() throws UnsupportedDeviceException {
-		List<OwDevice> list = owc.list("10");
+	public void testListSingleDeviceType1() throws UnsupportedDeviceException {
+		List<OwSensor> list = owc.list("10");
+		int expected = 1;
+		int actual = list.size();
+		assertEquals(expected, actual);
+	}
+
+	public void testListSingleDeviceType2() throws UnsupportedDeviceException {
+		List<OwSensor> list = owc.list("26");
 		int expected = 1;
 		int actual = list.size();
 		assertEquals(expected, actual);
@@ -183,19 +209,25 @@ public class OwClientTest extends TestCase {
 
 	public void testIsSupportedWithSupportedFamCode2() {
 		boolean expected = true;
-		boolean actual = OwClient.isSupported("1F");
-		assertEquals(expected, actual);
-	}
-
-	public void testIsSupportedWithSupportedFamCode3() {
-		boolean expected = true;
 		boolean actual = OwClient.isSupported("26");
 		assertEquals(expected, actual);
 	}
 
-	public void testIsSupportedWithSupportedFamCode4() {
-		boolean expected = true;
+	public void testIsSupportedWithNotSupportedFamCode1() {
+		boolean expected = false;
+		boolean actual = OwClient.isSupported("1F");
+		assertEquals(expected, actual);
+	}
+
+	public void testIsSupportedWithNotSupportedFamCode2() {
+		boolean expected = false;
 		boolean actual = OwClient.isSupported("81");
+		assertEquals(expected, actual);
+	}
+
+	public void testIsSupportedWithNotSupportedDeviceId1() {
+		boolean expected = false;
+		boolean actual = OwClient.isSupported("xx");
 		assertEquals(expected, actual);
 	}
 
@@ -205,33 +237,27 @@ public class OwClientTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testIsSupportedWithNotSupportedDevice() {
+	public void testIsSupportedSensorWithNotSupportedDeviceId() {
 		boolean expected = false;
-		boolean actual = OwClient.isSupported("xx");
-		assertEquals(expected, actual);
-	}
-
-	public void testIsSupportedSensorWithSupportedDeviceId() {
-		boolean expected = true;
-		boolean actual = OwClient.isSupportedSensor("10.16438A010800");
+		boolean actual = OwClient.isSupported("1F.16E103000000");
 		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedSensorWithSupportedFamCode() {
 		boolean expected = true;
-		boolean actual = OwClient.isSupportedSensor("26");
+		boolean actual = OwClient.isSupported("26");
 		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedSensorWithNotSupportedDevice1() {
 		boolean expected = false;
-		boolean actual = OwClient.isSupportedSensor("1F");
+		boolean actual = OwClient.isSupported("1F");
 		assertEquals(expected, actual);
 	}
 
 	public void testIsSupportedSensorWithNotSupportedDevice2() {
 		boolean expected = false;
-		boolean actual = OwClient.isSupportedSensor("xx");
+		boolean actual = OwClient.isSupported("xx");
 		assertEquals(expected, actual);
 	}
 }

@@ -27,15 +27,6 @@ import org.owfs.ownet.OWNet;
 
 public class OwClient {
 
-	/**
-	 * An enumeration of the 1-wire devices supported by OwClient.
-	 */
-	public static enum DeviceType {
-		DS18S20, DS2438, DS2409
-	};
-
-	private final static String[] familyCodes = { "10", "26", "81", "1F" };
-
 	OWNet ownet = null;
 	OwDeviceFactory odf = null;
 
@@ -49,11 +40,18 @@ public class OwClient {
 		this.odf = new OwDeviceFactory();
 	}
 
-	public OwDevice find(String id) throws UnsupportedDeviceException,
+	public OwSensor find(String id) throws UnsupportedDeviceException,
 			DeviceNotFoundException {
-		if (!OwDeviceFactory.canCreate(id)) {
-			throw new IllegalArgumentException("Device type is not supported");
+		if (id == null) {
+			throw new IllegalArgumentException(
+					"Argument 'null' invalid for method find(String id). The method requires a valid uique 1-wire ID.");
 		}
+
+		if (!OwDeviceFactory.canCreate(id)) {
+			throw new UnsupportedDeviceException("Device: " + id
+					+ " is not supported");
+		}
+
 		String[] str = { "/" };
 		String path = getDevicePath(id, str, null);
 		return odf.createDevice(path);
@@ -62,11 +60,11 @@ public class OwClient {
 	/**
 	 * Returns a collection of all devices attached to this 1-wire network.
 	 * 
-	 * @return List<OwDevice> collection of attached devices.
+	 * @return List<OwSensor> collection of attached devices.
 	 */
-	public List<OwDevice> list() {
+	public List<OwSensor> list() {
 		String[] in = { "/" };
-		List<OwDevice> list = list("*", in, null, null);
+		List<OwSensor> list = list("*", in, null, null);
 		return list;
 	}
 
@@ -79,7 +77,7 @@ public class OwClient {
 	 * @return A collection of attached devices.
 	 * @throws UnsupportedDeviceException
 	 */
-	public List<OwDevice> list(String familyCode)
+	public List<OwSensor> list(String familyCode)
 			throws UnsupportedDeviceException {
 		String[] in = { "/" };
 		if (!isSupported(familyCode)) {
@@ -87,13 +85,13 @@ public class OwClient {
 					+ familyCode + " is not supported.");
 		}
 
-		List<OwDevice> list = list(familyCode, in, null, null);
+		List<OwSensor> list = list(familyCode, in, null, null);
 		return list;
 	}
 
-	public List<OwDevice> list(String familyCode, String path) {
+	public List<OwSensor> list(String familyCode, String path) {
 		String[] in = { path }; // TODO Check valid path
-		List<OwDevice> list = list("*", in, null, null);
+		List<OwSensor> list = list("*", in, null, null);
 		return list;
 	}
 
@@ -104,10 +102,10 @@ public class OwClient {
 	 * @param deviceIdCache
 	 * @return
 	 */
-	protected List<OwDevice> list(String familyCode, String[] in,
-			List<OwDevice> devices, List<String> deviceIdCache) {
+	protected List<OwSensor> list(String familyCode, String[] in,
+			List<OwSensor> devices, List<String> deviceIdCache) {
 		if (devices == null) {
-			devices = new ArrayList<OwDevice>(5);
+			devices = new ArrayList<OwSensor>(5);
 		}
 		if (deviceIdCache == null) {
 			deviceIdCache = new ArrayList<String>(5);
@@ -135,10 +133,10 @@ public class OwClient {
 					next.add(p + "/main/");
 				}
 			}
-			if (isSupportedSensor(curFamilyCode)) {
+			if (isSupported(curFamilyCode)) {
 				if (familyCode.equalsIgnoreCase("*")
 						|| curFamilyCode.equalsIgnoreCase(familyCode)) {
-					OwDevice owd;
+					OwSensor owd;
 					try {
 						owd = odf.createDevice(p);
 						devices.add(owd);
@@ -243,43 +241,20 @@ public class OwClient {
 	 * @return <code>true</code> if the ID or family code is supported and
 	 *         <code>false</code> if not.
 	 */
-	public static boolean isSupportedSensor(String idOrFamilyCode) {
-
-		idOrFamilyCode = idOrFamilyCode.trim();
-		if (idOrFamilyCode.length() > 2) {
-			idOrFamilyCode = idOrFamilyCode.substring(0, 2);
-		}
-		if (idOrFamilyCode.equalsIgnoreCase("1F")) {
-			return false;
-		} else {
-			return isSupported(idOrFamilyCode);
-		}
-	}
-
-	/**
-	 * Checks if <i>any device</i> identified by a 1-wire ID or family code is
-	 * supported by this implementation.
-	 * 
-	 * @param idOrFamilyCode
-	 *            to check if it is supported
-	 * @return <code>true</code> if the ID or family code is supported and
-	 *         <code>false</code> if not.
-	 */
 	public static boolean isSupported(String idOrFamilyCode) {
-		boolean supported = false;
 
+		boolean isSupported = false;
 		idOrFamilyCode = idOrFamilyCode.trim();
 		if (idOrFamilyCode.length() > 2) {
 			idOrFamilyCode = idOrFamilyCode.substring(0, 2);
 		}
 
-		for (String code : familyCodes) {
-			if (code.equalsIgnoreCase(idOrFamilyCode)) {
-				supported = true;
+		for (String fam : OwDevice.supportedFamilyCodes) {
+			if (idOrFamilyCode.equalsIgnoreCase(fam)) {
+				isSupported = true;
 			}
 		}
-
-		return supported;
+		return isSupported;
 	}
 
 	public void print() {

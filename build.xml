@@ -34,7 +34,7 @@
                    
      Martin Strandbygaard                                                                
      ====================================================================== -->
-<project name="owclient" default="compile" basedir=".">
+<project name="owclient" default="jar" basedir=".">
 	<description>
 		Ant build file to create owclient artifiacts.
 	</description>

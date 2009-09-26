@@ -26,8 +26,7 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-
-import net.strandbygaard.onewire.owclient.OwDevice.Reading;
+import net.strandbygaard.onewire.owclient.OwSensor.Reading;
 
 import org.owfs.ownet.OWNet;
 
@@ -67,6 +66,9 @@ public class OwClientCLI {
 				.ofType(Integer.class);
 		OptionSpec<String> id = parser.acceptsAll(asList("i", "id"),
 				"ID of 1-wire device to read.").withRequiredArg().ofType(
+				String.class);
+		OptionSpec<String> fam = parser.acceptsAll(asList("fam", "family"),
+				"Family of 1-wire devices to read.").withRequiredArg().ofType(
 				String.class);
 		parser.acceptsAll(asList("temp", "temperature"),
 				"Output temperature reading of specified device");
@@ -134,10 +136,23 @@ public class OwClientCLI {
 			return;
 		}
 		if (options.has("all")) {
-			List<OwDevice> devices = owc.list();
-			for (OwDevice owd : devices) {
+			List<OwSensor> devices = owc.list();
+			for (OwSensor owd : devices) {
 				System.out.print(owd.getId() + ": ");
 				System.out.println(owd.toString());
+			}
+		}
+
+		if (options.has("fam")) {
+			List<OwSensor> devices;
+			try {
+				devices = owc.list(options.valueOf(fam));
+				for (OwSensor owd : devices) {
+					System.out.print(owd.getId() + ": ");
+					System.out.println(owd.toString());
+				}
+			} catch (UnsupportedDeviceException e) {
+				e.printStackTrace();
 			}
 		}
 

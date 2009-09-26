@@ -35,18 +35,18 @@ public class OwDeviceFactory {
 		}
 	}
 
-	public OwDevice createDevice(String path) throws UnsupportedDeviceException {
-		OwDevice dev = null;
+	public OwSensor createDevice(String path) throws UnsupportedDeviceException {
+		OwSensor dev = null;
 		dev = construct(path);
 		return dev;
 	}
 
-	private OwDevice construct(String path) throws UnsupportedDeviceException {
+	private OwSensor construct(String path) throws UnsupportedDeviceException {
 		if (path == null) {
 			return null;
 		}
 
-		OwDevice dev = null;
+		OwSensor dev = null;
 		String id = path.substring(path.lastIndexOf("/") + 1);
 		id = id.substring(0, 2);
 		id = id.toUpperCase();
@@ -65,27 +65,46 @@ public class OwDeviceFactory {
 			dev = new DS2438(path, owc);
 		}
 
-		if (id.equalsIgnoreCase("81")) {
-			dev = new OwDeviceImpl(path, owc) {
-				@Override
-				public double read(Reading r) {
-					return 0;
-				}
-			};
-		}
+		// if (id.equalsIgnoreCase("81")) {
+		// dev = new OwSensorImpl(path, owc) {
+		// @Override
+		// public double read(Reading r) {
+		// return 0;
+		// }
+		//
+		// public String getUnit(Reading r) {
+		// // TODO Auto-generated method stub
+		// return null;
+		// }
+		// };
+		// }
 
-		if (id.equalsIgnoreCase("1F")) {
-			dev = new DS2409(path, owc);
-		}
+		// if (id.equalsIgnoreCase("1F")) {
+		// dev = new DS2409(path, owc);
+		// }
 
 		return dev;
 	}
 
+	/**
+	 * Checks an 1-wire device specified by its unique ID can be created by this
+	 * factory implementation.
+	 * 
+	 * It compares the passed value to the elements in
+	 * {@link net.strandbygaard.onewire.owclient.OwDevice.supportedFamilyCodes}
+	 * 
+	 * @param id
+	 *            - the ID of the 1-wire device to check if an implementation is
+	 *            available.
+	 * @return <code>true</code> if the the device is supported, and
+	 *         <code>false</code> if not.
+	 */
 	public static boolean canCreate(String id) {
 		boolean b = false;
-		if (id.startsWith("10") || id.startsWith("26") || id.startsWith("81")
-				|| id.startsWith("1F")) {
-			b = true;
+		for (String fam : OwDevice.supportedFamilyCodes) {
+			if (id.startsWith(fam)) {
+				b = true;
+			}
 		}
 		return b;
 	}

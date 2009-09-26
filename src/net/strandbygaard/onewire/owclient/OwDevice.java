@@ -20,19 +20,11 @@
 package net.strandbygaard.onewire.owclient;
 
 public interface OwDevice {
-
-	public static enum Reading {
-		TEMP, HUM
-	};
+	
+	public static final String [] supportedFamilyCodes = {"10", "26"};
 	
 	String getId();
 
 	String getPath();
 	
-	long getLastUpdate();
-	
-	double read(Reading r);
-	
-	boolean canUpdate();
-
 }

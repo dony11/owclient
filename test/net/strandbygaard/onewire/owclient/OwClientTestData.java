@@ -20,7 +20,7 @@ package net.strandbygaard.onewire.owclient;
 
 public class OwClientTestData {
 
-	final static int TOTALDEVICES = 3;
+	final static int TOTALDEVICES = 2;
 
 	final static String[] rootPaths = { "/1F.16E103000000", "/1F.A3E903000000",
 			"/1F.AFE103000000", "/bus.0", "/uncached", "/settings", "/system",

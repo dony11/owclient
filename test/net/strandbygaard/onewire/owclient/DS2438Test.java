@@ -20,12 +20,12 @@ package net.strandbygaard.onewire.owclient;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import net.strandbygaard.onewire.owclient.OwDevice.Reading;
 import junit.framework.TestCase;
+import net.strandbygaard.onewire.owclient.OwSensor.Reading;
 
 public class DS2438Test extends TestCase {
 
-	private OwDevice owd;
+	private OwSensor owd;
 	private OwClient owc;
 
 	private static final String DEVICEID = "26.373BB6000000";
@@ -63,6 +63,18 @@ public class DS2438Test extends TestCase {
 	public void testGetPath() {
 		String expected = DEVICEPATH;
 		String actual = owd.getPath();
+		assertEquals(expected, actual);
+	}
+
+	public void testCanRead1() {
+		boolean expected = true;
+		boolean actual = owd.canRead(Reading.TEMP);
+		assertEquals(expected, actual);
+	}
+	
+	public void testCanRead2() {
+		boolean expected = true;
+		boolean actual = owd.canRead(Reading.HUM);
 		assertEquals(expected, actual);
 	}
 

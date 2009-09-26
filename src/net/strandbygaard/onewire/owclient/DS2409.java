@@ -28,11 +28,6 @@ public class DS2409 extends OwDeviceImpl {
 	}
 
 	@Override
-	public double read(Reading r) {
-		return 0;
-	}
-
-	@Override
 	public String toString() {
 		return id;
 	}
