@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.strandbygaard.onewire.device.OwDevice;
+import net.strandbygaard.onewire.device.OwSensor;
+
 import org.owfs.ownet.OWNet;
 
 public class OwClient {

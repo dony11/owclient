@@ -25,6 +25,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import net.strandbygaard.onewire.device.OwSensor;
+
 import org.owfs.ownet.OWNet;
 
 public class OwClientTest extends TestCase {
@@ -85,10 +87,12 @@ public class OwClientTest extends TestCase {
 		assertNull(owd);
 	}
 
-	public void testFindNotAttachedDevice1() throws Exception {
+	public void testFindNotAttachedDevice1() {
 		OwSensor owd = null;
 		try {
 			owd = owc.find("10.xxxxxxxxxxxx");
+		} catch (UnsupportedDeviceException e) {
+			e.printStackTrace();
 		} catch (DeviceNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -100,6 +104,8 @@ public class OwClientTest extends TestCase {
 		OwSensor owd = null;
 		try {
 			owd = owc.find("10");
+		} catch (UnsupportedDeviceException e) {
+			e.printStackTrace();
 		} catch (DeviceNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -111,7 +117,20 @@ public class OwClientTest extends TestCase {
 		OwSensor owd = null;
 		try {
 			owd = owc.find("10.");
+		} catch (UnsupportedDeviceException e) {
+			e.printStackTrace();
 		} catch (DeviceNotFoundException e) {
+			e.printStackTrace();
+		}
+		assertNull(owd);
+	}
+
+	public void testFindNotAttachedDevice4() throws UnsupportedDeviceException,
+			DeviceNotFoundException {
+		OwSensor owd = null;
+		try {
+			owd = owc.find(null);
+		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 		assertNull(owd);
@@ -123,9 +142,15 @@ public class OwClientTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testDirANonExistingPath() {
+	public void testDirANonExistingPath1() {
 		String[] expected = null;
 		String[] actual = owc.dir("");
+		assertEquals(expected, actual);
+	}
+
+	public void testDirANonExistingPath2() {
+		String[] expected = null;
+		String[] actual = owc.dir(null);
 		assertEquals(expected, actual);
 	}
 
@@ -156,6 +181,12 @@ public class OwClientTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
+	public void testReadNonExistingPath3() {
+		String expected = null;
+		String actual = owc.read(null);
+		assertEquals(expected, actual);
+	}
+
 	public void testListAllAttachedDevices1() {
 		List<OwSensor> deviceList = owc.list();
 
@@ -164,7 +195,7 @@ public class OwClientTest extends TestCase {
 
 	public void testListAllAttachedDevices2() {
 		List<OwSensor> deviceList = owc.list();
-		
+
 		for (OwSensor dev : deviceList) {
 			assertNotNull(dev);
 		}

@@ -17,7 +17,9 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.strandbygaard.onewire.owclient;
+package net.strandbygaard.onewire.device;
+
+import net.strandbygaard.onewire.owclient.OwClient;
 
 public class DS2438 extends OwSensorImpl {
 
@@ -25,6 +27,10 @@ public class DS2438 extends OwSensorImpl {
 	public static final String HUMIDITY = "/humidity";
 	private double temperature;
 	private double humidity;
+
+	public DS2438(OwPath path, OwClient owc) {
+		super(path, owc);
+	}
 
 	public DS2438(String path, OwClient owc) {
 		super(path, owc);

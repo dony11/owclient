@@ -17,12 +17,18 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.strandbygaard.onewire.owclient;
+package net.strandbygaard.onewire.device;
+
+import net.strandbygaard.onewire.owclient.OwClient;
 
 public class DS18S20 extends OwSensorImpl {
 
 	public static final String TEMPERATURE = "/temperature";
 	private double temperature;
+
+	public DS18S20(OwPath path, OwClient owc) {
+		super(path, owc);
+	}
 
 	public DS18S20(String path, OwClient owc) {
 		super(path, owc);

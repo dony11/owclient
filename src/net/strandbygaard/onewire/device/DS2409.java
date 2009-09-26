@@ -16,15 +16,25 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package net.strandbygaard.onewire.device;
 
-package net.strandbygaard.onewire.owclient;
+import net.strandbygaard.onewire.owclient.OwClient;
 
-public interface OwDevice {
-	
-	public static final String [] supportedFamilyCodes = {"10", "26"};
-	
-	String getId();
+public class DS2409 extends OwDeviceImpl {
 
-	String getPath();
-	
+	public static final String ID = "/id";
+	public static final String ADDRESS = "/address";
+
+	public DS2409(OwPath path, OwClient owc) {
+		super(path, owc);
+	}
+
+	public DS2409(String path, OwClient owc) {
+		super(path, owc);
+	}
+
+	@Override
+	public String toString() {
+		return id.getId();
+	}
 }

@@ -18,6 +18,13 @@
  */
 package net.strandbygaard.onewire.owclient;
 
+import net.strandbygaard.onewire.device.DS18S20;
+import net.strandbygaard.onewire.device.DS2438;
+import net.strandbygaard.onewire.device.OwDevice;
+import net.strandbygaard.onewire.device.OwId;
+import net.strandbygaard.onewire.device.OwPath;
+import net.strandbygaard.onewire.device.OwSensor;
+
 public class OwDeviceFactory {
 
 	private static OwClient owc = null;
@@ -35,33 +42,38 @@ public class OwDeviceFactory {
 		}
 	}
 
-	public OwSensor createDevice(String path) throws UnsupportedDeviceException {
+	public OwSensor createDevice(OwPath path) throws UnsupportedDeviceException {
 		OwSensor dev = null;
 		dev = construct(path);
 		return dev;
 	}
+	
+	public OwSensor createDevice(String path) throws UnsupportedDeviceException {
+		OwPath op = new OwPath(path);
+		OwSensor dev = null;
+		dev = construct(op);
+		return dev;
+	}
 
-	private OwSensor construct(String path) throws UnsupportedDeviceException {
+	private OwSensor construct(OwPath path) throws UnsupportedDeviceException {
 		if (path == null) {
 			return null;
 		}
 
 		OwSensor dev = null;
-		String id = path.substring(path.lastIndexOf("/") + 1);
-		id = id.substring(0, 2);
-		id = id.toUpperCase();
+		OwId id = path.getIdFromPath();
 
-		if (!canCreate(id)) {
+		if (!canCreate(id.getFamilyCode())) {
 			throw new UnsupportedDeviceException(
 					"Unable to create device with family code: "
-							+ id.substring(0, 2));
+							+ id.getFamilyCode());
 		}
 
-		if (id.equalsIgnoreCase("10")) {
+		if (id.isFamilyCode("10")) {
 			dev = new DS18S20(path, owc);
 		}
 
-		if (id.equalsIgnoreCase("26")) {
+		if (id.isFamilyCode("26")) {
 			dev = new DS2438(path, owc);
 		}
 
@@ -91,7 +103,7 @@ public class OwDeviceFactory {
 	 * factory implementation.
 	 * 
 	 * It compares the passed value to the elements in
-	 * {@link net.strandbygaard.onewire.owclient.OwDevice.supportedFamilyCodes}
+	 * {@link net.strandbygaard.onewire.device.OwDevice#supportedFamilyCodes}
 	 * 
 	 * @param id
 	 *            - the ID of the 1-wire device to check if an implementation is

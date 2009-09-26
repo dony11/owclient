@@ -26,7 +26,11 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.strandbygaard.onewire.owclient.OwSensor.Reading;
+import net.strandbygaard.onewire.device.DS18S20;
+import net.strandbygaard.onewire.device.DS2438;
+import net.strandbygaard.onewire.device.OwDevice;
+import net.strandbygaard.onewire.device.OwSensor;
+import net.strandbygaard.onewire.device.OwSensor.Reading;
 
 import org.owfs.ownet.OWNet;
 

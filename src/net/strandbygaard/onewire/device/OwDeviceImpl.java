@@ -17,41 +17,56 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.strandbygaard.onewire.owclient;
+package net.strandbygaard.onewire.device;
+
+import net.strandbygaard.onewire.owclient.OwClient;
 
 public class OwDeviceImpl implements OwDevice {
 
 	public static final long UPDATE_INTERVAL = 1;
 
-	protected String id;
-	protected String path;
+	protected OwId id;
+	protected OwPath path;
 	protected long lastUpdate;
 	protected OwClient owc;
 
-	public OwDeviceImpl(String path, OwClient owc) {
-		if (path.endsWith("/")) {
-			path = path.substring(0, path.length() - 1);
+	public OwDeviceImpl(OwPath path, OwClient owc) {
+		if (path == null) {
+			path = new OwPath("");
 		}
+
+		if (owc == null) {
+			throw new IllegalArgumentException("OwClient cannot be null");
+		}
+
 		this.path = path;
 		this.owc = owc;
-		this.id = path.substring(path.lastIndexOf("/") + 1);
+		this.id = path.getIdFromPath();
+	}
+
+	public OwDeviceImpl(String path, OwClient owc) {
+		this(new OwPath(path), owc);
 	}
 
 	public OwDeviceImpl(String path) {
-		this.path = path;
-		this.id = path.substring(path.lastIndexOf("/") + 1);
+		if (path == null) {
+			path = "";
+		}
+		
+		this.path = new OwPath(path);
+		this.id = this.path.getIdFromPath();
 	}
 
-	public String getId() {
+	public OwId getId() {
 		return id;
 	}
 
-	public String getPath() {
+	public OwPath getPath() {
 		return path;
 	}
 
 	@Override
 	public String toString() {
-		return this.id;
+		return id.getId();
 	}
 }

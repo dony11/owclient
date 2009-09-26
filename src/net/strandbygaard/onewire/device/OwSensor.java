@@ -16,19 +16,30 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.strandbygaard.onewire.owclient;
+package net.strandbygaard.onewire.device;
 
-public class DS2409 extends OwDeviceImpl {
+public interface OwSensor extends OwDevice {
+	
+	public static enum Reading {
+		TEMP, HUM
+	};
 
-	public static final String ID = "/id";
-	public static final String ADDRESS = "/address";
+	public static enum Unit {
+		TEMP, HUM
+	};
 
-	public DS2409(String path, OwClient owc) {
-		super(path, owc);
-	}
+	boolean canRead(Reading r);
+	
+	double read(Reading r);
 
-	@Override
-	public String toString() {
-		return id;
-	}
+	public String getUnit(Reading r);
+	
+	boolean canUpdate();
+
+	public void update();
+	
+	long getLastUpdate();
+	
+
+
 }

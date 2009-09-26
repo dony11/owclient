@@ -16,13 +16,17 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.strandbygaard.onewire.owclient;
+package net.strandbygaard.onewire.device;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import junit.framework.TestCase;
-import net.strandbygaard.onewire.owclient.OwSensor.Reading;
-import net.strandbygaard.onewire.owclient.OwSensor.Unit;
+import net.strandbygaard.onewire.device.DS18S20;
+import net.strandbygaard.onewire.device.OwId;
+import net.strandbygaard.onewire.device.OwPath;
+import net.strandbygaard.onewire.device.OwSensor;
+import net.strandbygaard.onewire.device.OwSensor.Reading;
+import net.strandbygaard.onewire.owclient.OwClient;
 
 public class DS18S20Test extends TestCase {
 
@@ -35,7 +39,7 @@ public class DS18S20Test extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		owc = mock(OwClient.class);
 		when(owc.read(DEVICEPATH + DS18S20.TEMPERATURE)).thenReturn("20.0");
 
@@ -47,22 +51,22 @@ public class DS18S20Test extends TestCase {
 	}
 
 	public void testGetId1() {
-		String expected = DEVICEID;
-		String actual = owd.getId();
-		assertEquals(expected, actual);
+		OwId expected = new OwId(DEVICEID);
+		OwId actual = owd.getId();
+		assertEquals(expected.getId(), actual.getId());
 	}
 
 	public void testGetId2() {
 		owd = new DS18S20(DEVICEPATH + "/", owc);
-		String expected = DEVICEID;
-		String actual = owd.getId();
-		assertEquals(expected, actual);
+		OwId expected = new OwId(DEVICEID);
+		OwId actual = owd.getId();
+		assertEquals(expected.getId(), actual.getId());
 	}
 
 	public void testGetPath() {
-		String expected = DEVICEPATH;
-		String actual = owd.getPath();
-		assertEquals(expected, actual);
+		OwPath expected = new OwPath(DEVICEPATH);
+		OwPath actual = owd.getPath();
+		assertEquals(expected.toString(), actual.toString());
 	}
 
 	public void testCanRead1() {
@@ -70,13 +74,13 @@ public class DS18S20Test extends TestCase {
 		boolean actual = owd.canRead(Reading.TEMP);
 		assertEquals(expected, actual);
 	}
-	
+
 	public void testCanRead2() {
 		boolean expected = false;
 		boolean actual = owd.canRead(Reading.HUM);
 		assertEquals(expected, actual);
 	}
-	
+
 	public void testRead() {
 		double expected = 20.0;
 		double actual = owd.read(Reading.TEMP);

@@ -39,14 +39,14 @@ public class OwDeviceFactoryTest extends TestCase {
 		assertEquals(expected, actual);
 	}
 
-	public void testCanCreate3() {
-		boolean expected = true;
+	public void testCanNotCreate1() {
+		boolean expected = false;
 		boolean actual = OwDeviceFactory.canCreate("1F");
 		assertEquals(expected, actual);
 	}
 
-	public void testCanCreate4() {
-		boolean expected = true;
+	public void testCanNotCreate2() {
+		boolean expected = false;
 		boolean actual = OwDeviceFactory.canCreate("81");
 		assertEquals(expected, actual);
 	}

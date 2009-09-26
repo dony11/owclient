@@ -16,24 +16,36 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.strandbygaard.onewire.owclient;
 
-import net.strandbygaard.onewire.device.DS18S20Test;
-import net.strandbygaard.onewire.device.DS2438Test;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package net.strandbygaard.onewire.device;
 
-public class AllTests {
+/**
+ * @author Martin Strandbygaard
+ * 
+ *         Interface to a 1-wire device.
+ * 
+ *         This is the most generalized interface representing 1-wire device.
+ *         Any 1-wire device regardless of type and purpose, can be accessed
+ *         using this interface.
+ * 
+ */
+public interface OwDevice {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				"Test for net.strandbygaard.onewire.owclient");
-		// $JUnit-BEGIN$
-		suite.addTestSuite(OwClientTest.class);
-		suite.addTestSuite(DS2438Test.class);
-		suite.addTestSuite(DS18S20Test.class);
-		// $JUnit-END$
-		return suite;
-	}
+	/**
+	 * A list of all 1-wire family codes supported by this implementation.
+	 */
+	public static final String[] supportedFamilyCodes = { "10", "26" };
+
+	/**
+	 * 
+	 * @return <code>String</code> id - The unique ID of this 1-wire device
+	 */
+	OwId getId();
+
+	/**
+	 * 
+	 * @return <code>String</code> path - The path (starting from /) to this 1-wire device
+	 */
+	OwPath getPath();
 
 }
