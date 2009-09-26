@@ -49,6 +49,9 @@
 	<property name="project.O" value="net.strandbygaard.onewire.owclient" />
 	<property name="project.C" value="DK" />
 
+	<property name="mockito.jar" value="mockito-all-1.8.0.jar" />
+	<property name="jopt.jar" value="jopt-simple-3.1.jar" />
+
 	<property name="jar.name" value="owclient.jar" />
 
 	<property name="meta-inf.dir" value="META-INF" />
@@ -121,7 +124,7 @@
 		<mkdir dir="${build.unzip.dir}" />
 		<unzip dest="${build.unzip.dir}">
 			<fileset dir="${lib.dir}">
-				<include name="**/*.jar" />
+				<include name="**/${jopt.jar}" />
 			</fileset>
 		</unzip>
 	</target>
