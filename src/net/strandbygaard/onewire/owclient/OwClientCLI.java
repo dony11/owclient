@@ -28,7 +28,6 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.strandbygaard.onewire.device.DS18S20;
 import net.strandbygaard.onewire.device.DS2438;
-import net.strandbygaard.onewire.device.OwDevice;
 import net.strandbygaard.onewire.device.OwSensor;
 import net.strandbygaard.onewire.device.OwSensor.Reading;
 
@@ -68,9 +67,9 @@ public class OwClientCLI {
 		OptionSpec<Integer> port = parser.acceptsAll(asList("p", "port"),
 				"Port of owserver. Defaults to port 4304").withRequiredArg()
 				.ofType(Integer.class);
-		OptionSpec<String> id = parser.acceptsAll(asList("i", "id"),
-				"ID of 1-wire device to read.").withRequiredArg().ofType(
-				String.class);
+		OptionSpec<String> id = parser.acceptsAll(
+				asList("i", "id", "ID", "Id"), "ID of 1-wire device to read.")
+				.withRequiredArg().ofType(String.class);
 		OptionSpec<String> fam = parser.acceptsAll(asList("fam", "family"),
 				"Family of 1-wire devices to read.").withRequiredArg().ofType(
 				String.class);
@@ -115,19 +114,19 @@ public class OwClientCLI {
 
 		if (options.has("id")) {
 			try {
-				OwDevice device = owc.find(options.valueOf(id));
+				OwSensor device = owc.find(options.valueOf(id));
 				if (options.has("temperature")) {
 					if (device.getClass() == DS18S20.class) {
-						System.out.print(((DS18S20) device).read(Reading.TEMP));
+						System.out.print(device.read(Reading.TEMP));
 					}
 					if (device.getClass() == DS2438.class) {
-						System.out.print(((DS2438) device).read(Reading.TEMP));
+						System.out.print(device.read(Reading.TEMP));
 					}
 				}
 
 				if (options.has("humidity")) {
 					if (device.getClass() == DS2438.class) {
-						System.out.print(((DS2438) device).read(Reading.HUM));
+						System.out.print(device.read(Reading.HUM));
 					}
 				}
 			} catch (IllegalArgumentException e) {
