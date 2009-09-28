@@ -129,24 +129,16 @@ public class OwClientCLI {
 						System.out.print(device.read(Reading.HUM));
 					}
 				}
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (DeviceNotFoundException e) {
-				e.printStackTrace();
-			} catch (UnsupportedDeviceException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return;
-		}
-		if (options.has("all")) {
+		} else if (options.has("all")) {
 			List<OwSensor> devices = owc.list();
 			for (OwSensor owd : devices) {
 				System.out.print(owd.getId() + ": ");
 				System.out.println(owd.toString());
 			}
-		}
-
-		if (options.has("fam")) {
+		} else if (options.has("fam")) {
 			List<OwSensor> devices;
 			try {
 				devices = owc.list(options.valueOf(fam));
@@ -160,6 +152,7 @@ public class OwClientCLI {
 		}
 
 		this.stopTimer();
+
 		if (options.has("time")) {
 			this.printRuntime();
 		}
