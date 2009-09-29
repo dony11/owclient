@@ -21,6 +21,21 @@ package net.strandbygaard.onewire.device;
 
 import net.strandbygaard.onewire.owclient.OwClient;
 
+/**
+ * <p>
+ * This class represents a 1-wire device of type DS18S20.
+ * </p>
+ * 
+ * <p>
+ * The DS18S20 is a high precision thermometer contained in a small 3 connector
+ * package. The device is most common 1-wire device encountered, and many other
+ * device types incorporates a DS18S20 (in parallel) because of it's small size,
+ * and the usefulness of having a temperature reading available.
+ * </p>
+ * 
+ * @author Martin Strandbygaard
+ * 
+ */
 public class DS18S20 extends OwSensorImpl {
 
 	public static final String TEMPERATURE = "/temperature";
@@ -46,9 +61,11 @@ public class DS18S20 extends OwSensorImpl {
 	public double read(Reading r) {
 		update();
 
+		// FIXME Returning temperature for any Reading r is not right.
 		return temperature;
 	}
 
+	@Override
 	public String getUnit(Reading r) {
 		String unit = "";
 		if (r == Reading.TEMP) {

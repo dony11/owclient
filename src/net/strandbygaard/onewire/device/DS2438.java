@@ -21,6 +21,25 @@ package net.strandbygaard.onewire.device;
 
 import net.strandbygaard.onewire.owclient.OwClient;
 
+/**
+ * <p>
+ * This class represents a 1-wire device of type DS2438.
+ * </p>
+ * 
+ * <p>
+ * The DS2438 battery monitor chip that is often used in a a combined
+ * thermometer and humidity sensor.
+ * </p>
+ * 
+ * <p>
+ * This class was developed for a device similar to Hobby Boards HT3-R1-A
+ * (combined thermometer and humidity sensor), and has only been tested with a
+ * Hobby Boards HTS3-R1-A, however similar devices should also work.
+ * </p>
+ * 
+ * @author Martin Strandbygaard
+ * 
+ */
 public class DS2438 extends OwSensorImpl {
 
 	public static final String TEMPERATURE = "/temperature";
@@ -57,6 +76,7 @@ public class DS2438 extends OwSensorImpl {
 		return val;
 	}
 
+	@Override
 	public String getUnit(Reading r) {
 		String unit = "";
 		if (r == Reading.TEMP) {

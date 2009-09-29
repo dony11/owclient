@@ -18,17 +18,49 @@
  */
 package net.strandbygaard.onewire.device;
 
+/**
+ * This class represents a unique 1-wire ID.
+ * 
+ * It adds additional methods, to support common actions on an ID, such as
+ * getting it's family code, and testing for membership [of a specific family
+ * code].
+ * 
+ * @author Martin Strandbygaard
+ * 
+ */
 public class OwId extends OwItem {
 
 	public OwId(String id) {
 		super(id);
+
+		/*
+		 * Enforces ID string formatting as upper case. It is often relevant to
+		 * compare two ID's, and the common formatting rule is white space
+		 * trimmed uppercase.
+		 */
 		super.item.toUpperCase();
 	}
 
+	/**
+	 * Getter for the ID represented by this class
+	 * 
+	 * @return a <code>string</code> with the unique ID
+	 */
 	public String getId() {
 		return super.item;
 	}
 
+	/**
+	 * Gets the family code part of this unique 1-wire ID.
+	 * 
+	 * The first two digits in a 1-wire ID represents the family code of the
+	 * device. The family code determines the functionality of a 1-wire device,
+	 * and each device type has a specific implementation supporting the device
+	 * types' specific features/functionality.
+	 * 
+	 * @return the family code of this unique 1-wire ID, if the ID is valid, and
+	 *         an empty string if not.
+	 */
 	public String getFamilyCode() {
 		if (item == "") {
 			return "";
@@ -60,4 +92,5 @@ public class OwId extends OwItem {
 
 		return isCode;
 	}
+
 }

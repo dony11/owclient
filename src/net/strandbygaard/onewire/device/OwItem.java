@@ -18,13 +18,30 @@
  */
 package net.strandbygaard.onewire.device;
 
+/**
+ * Parent class used to sub class to represent specific 1-wire attributes of a
+ * 1-wire device.
+ * 
+ * Any sub class of this class should adhere to the pattern of only
+ * encapsulating one property, and use this class as super class to store that
+ * property.
+ * 
+ * This class encapsulates a white space trimmed string property and ensures
+ * non-nullability [of this property]. Specific attribute implementations made
+ * add additional logic.
+ * 
+ * @author Martin Strandbygaard
+ * 
+ */
 public class OwItem {
 
+	/*
+	 * The property encapsulated by this class
+	 */
 	protected String item;
 
 	OwItem(String item) {
-		if(item == null)
-		{
+		if (item == null) {
 			this.item = "";
 		} else {
 			this.item = item.trim();
@@ -34,5 +51,19 @@ public class OwItem {
 	@Override
 	public String toString() {
 		return item;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if ((o == null) || (o.getClass() != this.getClass())) {
+			return false;
+		}
+
+		// object must be OwItem at this point
+		return item.equalsIgnoreCase(((OwItem) o).toString());
 	}
 }

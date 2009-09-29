@@ -20,13 +20,22 @@
 package net.strandbygaard.onewire.device;
 
 /**
+ * <p>
+ * Interface to a 1-wire device.
+ * </p>
+ * 
+ * <p>
+ * This is the most generalized interface representing 1-wire device. Any 1-wire
+ * device regardless of type and purpose, can be accessed using this interface.
+ * </p>
+ * 
+ * <p>
+ * The interface exposes methods to get the unique ID of a 1-wire device, and
+ * the fully qualified path to the device on a 1-wire bus.
+ * </p>
+ * 
  * @author Martin Strandbygaard
  * 
- *         Interface to a 1-wire device.
- * 
- *         This is the most generalized interface representing 1-wire device.
- *         Any 1-wire device regardless of type and purpose, can be accessed
- *         using this interface.
  * 
  */
 public interface OwDevice {
@@ -34,6 +43,7 @@ public interface OwDevice {
 	/**
 	 * A list of all 1-wire family codes supported by this implementation.
 	 */
+	// TODO Refactor this implementation
 	public static final String[] supportedFamilyCodes = { "10", "26" };
 
 	/**
@@ -44,7 +54,8 @@ public interface OwDevice {
 
 	/**
 	 * 
-	 * @return <code>String</code> path - The path (starting from /) to this 1-wire device
+	 * @return <code>String</code> path - The path (starting from /) to this
+	 *         1-wire device
 	 */
 	OwPath getPath();
 
